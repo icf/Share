@@ -1,0 +1,14 @@
+ numOfJastrow                         2                          
+ JastrowSlice_0                       1                          
+ JastrowSlice_1                       1                          
+ JastrowName_0                        generalHamiltonian_HAFQMC_icf 
+ JastrowName_1                        generalHamiltonian_K_HAFQMC_icf 
+ JastrowExpM_0                        2                          
+ JastrowExpM_1                        2                          
+ Metro_dtET                           -1.400000000000000133e+00  
+ seed                                 0                          
+ BPMetroSampleCap                     5                          
+ BPMetroStabilizeStep                 1                          
+ blockNum                             0                          
+ BPMetroForceType                     constForce                 
+ BPMetroInitialAuxiliaryFlag          constForceInitial          

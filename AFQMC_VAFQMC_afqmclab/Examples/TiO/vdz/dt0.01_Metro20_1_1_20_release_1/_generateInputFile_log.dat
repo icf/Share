@@ -1,0 +1,1867 @@
+spin TiO 2
+#INFO: **** input file is /public1/home/sc31257/Zhi-Yu_Xiao/data/realMaterials/TiO/dt0.01_Metro20_1_1_20_release_1/ICF_afqmcPhaselessWithMetroChains_ForGeneralHamiltonian_withHAFQMCInput_1_7_2025_Formal/generateInputFile.py ****
+import os
+import sys; sys.path.append( os.environ['AFQMCLAB_DIR']+"/scripts/pyscf" )
+from molecule import *
+from rhf import *
+from uhf import *
+from model import *
+import numpy as np
+
+import pyscf
+from   pyscf  import scf
+
+
+#####################################################################
+#model parameters
+#####################################################################
+one_atom          = 'Ti'   #+O
+chrg              = 0
+spn               = 2
+basis             = 'vdz'
+
+#######################################################################################
+#Jastrow param
+#############################################################################################
+#Method Parameter
+Jastrow_rhf_address='Zixiang_icf_TiO/AFQMC_rhf.chk'
+Jastrow_model_address='Zixiang_icf_TiO/AFQMC_hamiltonian.pkl'
+Jastrow_address='Zixiang_icf_TiO/checkpoint_10000.pkl'
+
+##
+JastrowSlice                        = [1                              ,1                                ]     #<Phi_T|=<SD|J_0 J_1 ... 
+JastrowName                         = ["generalHamiltonian_HAFQMC_icf","generalHamiltonian_K_HAFQMC_icf"] #  "generalHamiltonian_HAFQMC_icf", "generalHamiltonian_K_HAFQMC_icf"
+JastrowExpM                         = [2              ,2                                ] #For both K and V, K is fixed to Hop at initialization
+numOfJastrow                        = len(JastrowSlice)
+
+##
+BPMetroSampleCap                     = 5
+BPMetroStabilizeStep                 = 1
+blockNum                             = 0
+BPMetroForceType			         = "constForce"
+BPMetroInitialAuxiliaryFlag		     = "constForceInitial"         #constForceInitial, dynamicForceInitial
+
+ET                                   = -14.0
+Metro_dtET                           = 0.1*ET   
+seed                                 = 0
+#write method_param
+f = open('afqmc_param_Metro', 'w')
+f.write(" {:<36} {:<26} \n".format("numOfJastrow",numOfJastrow) )
+for i in range(numOfJastrow):
+    f.write(" {:<36} {:<26} \n".format("JastrowSlice_"+str(i),JastrowSlice[i]) )
+for i in range(numOfJastrow):
+    f.write(" {:<36} {:<26} \n".format("JastrowName_"+str(i),JastrowName[i]) )
+for i in range(numOfJastrow):
+    f.write(" {:<36} {:<26} \n".format("JastrowExpM_"+str(i),JastrowExpM[i]) )
+f.write(" {:<36} {:<26.18e} \n".format("Metro_dtET", Metro_dtET) )
+f.write(" {:<36} {:<26} \n".format("seed", seed) )
+
+f.write(" {:<36} {:<26} \n".format("BPMetroSampleCap", BPMetroSampleCap) )
+f.write(" {:<36} {:<26} \n".format("BPMetroStabilizeStep", BPMetroStabilizeStep) )
+f.write(" {:<36} {:<26} \n".format("blockNum", blockNum) )
+f.write(" {:<36} {:<26} \n".format("BPMetroForceType", BPMetroForceType) )
+f.write(" {:<36} {:<26} \n".format("BPMetroInitialAuxiliaryFlag", BPMetroInitialAuxiliaryFlag) )
+f.close()
+
+#####################################################################
+#AFQMC parameters
+#####################################################################
+dt                                   = 0.01
+thermalSize                          = 4000
+writeNumber                          = 200
+measureNumberPerWrite                = 2
+measureSkipStep                      = 50
+walkerSizePerThread                  = 1
+forceType                            = "dynamicForce" # "dynamicForce", "constForce"
+forceCap                             = 10
+initialPhiTFlag                      = "readFromFile" #"setFromModel", "setRandomly", "readFromFile"
+initialWalkerFlag                    = "readFromFile"  #"setFromModel", "setRandomly", "sampleFromPhiT","readFromFile","readAllWalkers"
+mgsStep                              = 10
+popControlStep                       = 10
+initPopControlMaxSize                = 0
+logEnergyCap                         = 4
+ET                                   = -10
+backGroundETInit                       = "EstimateFromPhiTWalker" #"EstimateFromPhiTWalker", "EstimateFromPhiT", "readFromFile"
+ETAdjustStep                         = 50
+ETAdjustMaxSize                      = 200
+ETAndBackGroundGrowthEstimateStep    = 50
+ETAndBackGroundGrowthEstimateMaxSize = 200
+seed                                 = 111
+
+#For release
+numOfReleasedSlice                   = 1
+
+#For Metropolis
+numOfChains                          = 20   #Due to TwoJastrow to One Jastrow, we only support one chain for now
+numOfThermalSweeps                   = 1
+numOfBrackets                        = 1
+
+#parameter for update and measure
+MetroUpdateSkip                      = 0
+numOfSweepMeasurements               = 20
+
+#write method_param
+f = open('afqmc_param', 'w')
+f.write(" {:<36} {:<26.18e} \n".format("dt", dt ) )
+f.write(" {:<36} {:<26} \n".format("thermalSize", thermalSize) )
+f.write(" {:<36} {:<26} \n".format("writeNumber", writeNumber) )
+f.write(" {:<36} {:<26} \n".format("measureNumberPerWrite", measureNumberPerWrite) )
+f.write(" {:<36} {:<26} \n".format("measureSkipStep", measureSkipStep) )
+f.write(" {:<36} {:<26} \n".format("walkerSizePerThread",walkerSizePerThread) )
+f.write(" {:<36} {:<26} \n".format("forceType", forceType) )
+f.write(" {:<36} {:<26.18e} \n".format("forceCap", forceCap) )
+f.write(" {:<36} {:<26} \n".format("initialPhiTFlag",initialPhiTFlag) )
+f.write(" {:<36} {:<26} \n".format("initialWalkerFlag",initialWalkerFlag) )
+f.write(" {:<36} {:<26} \n".format("mgsStep", mgsStep) )
+f.write(" {:<36} {:<26} \n".format("popControlStep", popControlStep) )
+f.write(" {:<36} {:<26} \n".format("initPopControlMaxSize", initPopControlMaxSize) )
+f.write(" {:<36} {:<26.18e} \n".format("logEnergyCap", logEnergyCap) )
+f.write(" {:<36} {:<26.18e} \n".format("ET", ET) )
+f.write(" {:<36} {:<26} \n".format("backGroundETInit", backGroundETInit) )
+f.write(" {:<36} {:<26} \n".format("ETAdjustStep", ETAdjustStep) )
+f.write(" {:<36} {:<26} \n".format("ETAdjustMaxSize", ETAdjustMaxSize) )
+f.write(" {:<36} {:<26} \n".format("ETAndBackGroundGrowthEstimateStep", ETAndBackGroundGrowthEstimateStep) )
+f.write(" {:<36} {:<26} \n".format("ETAndBackGroundGrowthEstimateMaxSize", ETAndBackGroundGrowthEstimateMaxSize) )
+f.write(" {:<36} {:<26} \n".format("seed", seed) )
+
+f.write(" {:<36} {:<26} \n".format("numOfReleasedSlice",numOfReleasedSlice) )
+
+f.write(" {:<36} {:<26} \n".format("numOfChains",numOfChains) )
+f.write(" {:<36} {:<26} \n".format("numOfBrackets",numOfBrackets) )
+f.write(" {:<36} {:<26} \n".format("numOfThermalSweeps",numOfThermalSweeps) )
+
+f.write(" {:<36} {:<26} \n".format("MetroUpdateSkip",MetroUpdateSkip) )
+f.write(" {:<36} {:<26} \n".format("numOfSweepMeasurements",numOfSweepMeasurements) )
+f.close()
+
+###################################################################################
+#functions
+###################################################################################
+import pickle
+def save_pickle(filename, data):
+    with open(filename, 'wb') as file:
+        pickle.dump(data, file)
+def load_pickle(filename):
+    with open(filename, 'rb') as file:
+        return pickle.load(file)
+    
+class CanonicalBais:
+
+    def __init__(self, mol, rhf, lindep=1e-8):
+
+        self.nbasis = mol.nao_nr()
+        ovlp   = rhf.get_ovlp()
+
+        value, vector = np.linalg.eigh( ovlp )
+        print( "Eigenvalue of overlap matrix: " )
+        for index, item in enumerate( value ):
+            print( "{:<9} {:26.18e}".format(index, item) )
+
+        if( lindep >= value[-1] ):
+            print("Error!!! lindep = {:.12f}, too big for determining the dependency!".format(lindep))
+            sys.exit(1)
+        numberOfDependent = next(i for i, v in enumerate(value) if v > lindep)
+
+        print( "Number of dependent obritals is {}.".format(numberOfDependent) )
+        print('\n')
+
+        self.L = self.nbasis - numberOfDependent
+
+        value = value[numberOfDependent:self.nbasis]
+        vector = vector[:,numberOfDependent:self.nbasis]
+        sqrtValue = np.sqrt(value)
+        self.X = vector / sqrtValue
+        self.XInv = vector.T * sqrtValue[:, None]
+        self.XT = self.X.T
+
+def getCholeskyAO(mol=None, tol=1e-8):
+
+    nbasis  = mol.nao_nr()
+    eri = scf._vhf.int2e_sph(mol._atm,mol._bas,mol._env)
+    V   = ao2mo.restore(1, eri, nbasis)
+    V   = V.reshape( nbasis*nbasis, nbasis*nbasis )
+
+    choleskyVecAO = []; choleskyNum = 0
+    Vdiag = V.diagonal().copy()
+    while True:
+        imax = np.argmax(Vdiag); vmax = Vdiag[imax]
+        print( "Inside modified Cholesky {:<9} {:26.18e}.".format(choleskyNum, vmax) )
+        if(vmax<tol or choleskyNum==nbasis*nbasis):
+            print( "Number of Cholesky fields is {:9}".format(choleskyNum) )
+            print('\n')
+            break
+        else:
+            oneVec = V[imax]/np.sqrt(vmax)
+            #
+            choleskyVecAO.append( oneVec )
+            choleskyNum+=1
+            V -= np.dot(oneVec[:, None], oneVec[None,:])
+            Vdiag -= oneVec**2
+        #
+    return choleskyNum, choleskyVecAO
+
+def getCholeskyMO_AO(mol=None, canonic=None, tol=1e-8):
+
+    nbasis  = mol.nao_nr()
+    choleskyNum, choleskyVecAO = getCholeskyAO(mol, tol)
+
+    choleskyVecMO = np.zeros((choleskyNum, canonic.L*canonic.L))
+    for i in range(choleskyNum):
+        oneVec = choleskyVecAO[i].reshape(nbasis, nbasis)
+        choleskyVecMO[i] = np.dot( canonic.XT, np.dot( oneVec, canonic.X ) ).ravel()
+
+    return choleskyNum, choleskyVecAO, choleskyVecMO
+
+
+##################################################################
+def setupMolecule_icf(atoms=None,chrg=None,spn=None,basis=None,psp=None,sym=None):
+
+    mol          = pyscf.gto.Mole()
+    mol.verbose  = 4
+    mol.output   = 'mole.dat'
+    mol.atom     = atoms
+    mol.charge   = chrg
+    mol.spin     = spn
+    mol.basis    = basis
+    mol.symmetry = sym
+    mol.ecp      = psp
+    mol.unit     = 'Angstrom'
+    mol.build()
+
+    Enuc    = gto.energy_nuc(mol)
+    nbasis  = mol.nao_nr()
+    nelec_a = (mol.nelectron+mol.spin)//2
+    nelec_b = (mol.nelectron-mol.spin)//2
+
+    print('Molecule [geometry in Angstrom]')
+    print(atoms)
+
+    print('Nuclear repulsion energy = {:26.18e} '.format(Enuc))
+
+    print('AO basis ',basis)
+    basis_label = gto.spheric_labels(mol)
+    for index, item in enumerate( basis_label ):
+        print( "{:<9} {:<16}".format(index, item) )
+
+    print('charge          {:>9d}'.format(chrg)   )
+    print('spin            {:>9d}'.format(spn)    )
+    print('orbitals        {:>9d}'.format(nbasis) )
+    print('alpha electrons {:>9d}'.format(nelec_a))
+    print('beta  electrons {:>9d}'.format(nelec_b))
+    print('\n')
+
+    return mol
+
+def writeInputForModel_forGeneralHamiltonian(scale=1.0, mol=None, rhf=None, canonic=None, tol=1e-8, name="model_param"):
+
+    Nup = (mol.nelectron+mol.spin)//2
+    Ndn = (mol.nelectron-mol.spin)//2
+
+    choleskyNum, choleskyVecMO = getCholeskyMO(mol, canonic, tol)
+    #
+    choleskyVecMO = choleskyVecMO * np.sqrt(scale)
+    t = np.dot( canonic.XT, np.dot( rhf.get_hcore(), canonic.X ) ) * scale
+    #
+    K = t.copy()
+    for i in range(choleskyNum):
+        oneVec = choleskyVecMO[i].reshape(canonic.L, canonic.L)
+        K += (-0.5)*np.dot( oneVec, oneVec )
+    ###############################
+    svdVecs=choleskyVecMO
+    svdNumber=choleskyNum
+    ############################
+    #ATTention: there is a transpose between python and c++ i/o trans
+    KT=np.zeros((2*canonic.L, 2*canonic.L),dtype=np.complex128)
+    KT[0:canonic.L,0:canonic.L]=K.transpose()
+    KT[canonic.L:2*canonic.L,canonic.L:2*canonic.L]=K.transpose()
+
+    svdVecsT=np.zeros((svdNumber, 2*canonic.L, 2*canonic.L),dtype=np.complex128)
+    for i in range(svdNumber):
+        svdVecsT[i,0:canonic.L,0:canonic.L]=svdVecs[i].reshape(canonic.L, canonic.L).transpose()
+        svdVecsT[i,canonic.L:2*canonic.L,canonic.L:2*canonic.L]=svdVecs[i].reshape(canonic.L, canonic.L).transpose()
+
+    f = h5py.File(name, "w")
+    f.create_dataset("L",              (1,),                                data=[2*canonic.L],           dtype='int')
+    f.create_dataset("Nup",              (1,),                                data=[Nup],           dtype='int')
+    f.create_dataset("Ndn",              (1,),                                data=[Ndn],           dtype='int')
+    f.create_dataset("N",            (1,),                                data=[Nup+Ndn],                     dtype='int')
+    f.create_dataset("svdNumber", (1,),                                data=[svdNumber],           dtype='int')
+    f.create_dataset("K_r",              ((2*canonic.L)**2,),                 data=KT.real.ravel(),                 dtype='float64')    #ATTention: there is a transpose between python and c++ i/o trans
+    f.create_dataset("svdVecs_r",   (svdNumber*(2*canonic.L)**2,), data=svdVecsT.real.ravel(),     dtype='float64')      #ATTention: there is a transpose between python and c++ i/o trans                    
+    f.create_dataset("svdBg_r",     (svdNumber,), data=np.zeros(svdNumber),   dtype='float64')
+    f.create_dataset("K_i",              ((2*canonic.L)**2,),                 data=KT.imag.ravel(),                 dtype='float64')    #ATTention: there is a transpose between python and c++ i/o trans
+    f.create_dataset("svdVecs_i",   (svdNumber*(2*canonic.L)**2,), data=svdVecsT.imag.ravel(),     dtype='float64')      #ATTention: there is a transpose between python and c++ i/o trans
+    f.create_dataset("svdBg_i",     (svdNumber,),                  data=np.zeros(svdNumber),   dtype='float64')
+    f.close()
+    
+
+def writeInputForModel_forGeneralHamiltonian_load_hamiltonian_and_selfCheck(mol=None, rhf=None, canonic=None, tol=1e-8, hamiltonian_path="AFQMC_hamiltonian.pkl", name="model_param"):
+    def get_orth_ao(mf):
+        X = mf.mo_coeff
+        return X
+    #
+    def rotate_h1e(h1e, X):
+        return X.conj().T @ h1e @ X
+    def rotate_eri_chol(ceri, X):
+        return np.einsum("kpr,pi,rl->kil", ceri, X.conj(), X)
+    def rotate_integrals(h1e, eri, X):
+        # the shape of X has to be [nao x nb]
+        # normally nb is nao but can also be less
+        # 1-body term
+        assert X.ndim == 2
+        h1e = rotate_h1e(h1e, X)
+        # eri, in cholesky vector
+        if isinstance(eri, np.ndarray) and eri.ndim == 3:
+            print("rotate_eri_chol!!!")
+            eri = rotate_eri_chol(eri, X)
+        # eri, in dense form or just mol
+        return h1e, eri
+    #############################################################################################
+    hamil = load_pickle(hamiltonian_path)
+    # hamil = load_pickle('Zixiang_d2.1/hamiltonian.pkl')
+    # hamil = load_pickle('AFQMC_hamiltonian.pkl')
+    ###############################
+    Nup = (mol.nelectron+mol.spin)//2
+    Ndn = (mol.nelectron-mol.spin)//2
+    choleskyNum, choleskyVecAO, choleskyVecMO = getCholeskyMO_AO(mol, canonic, tol)
+    #
+    t = np.dot( canonic.XT, np.dot( rhf.get_hcore(), canonic.X ) )
+    #
+    K = t.copy()
+    for i in range(choleskyNum):
+        oneVec = choleskyVecMO[i].reshape(canonic.L, canonic.L)
+        K += (-0.5)*np.dot( oneVec, oneVec )
+    ###############################
+    h1e_read, ceri_read, enuc_read, (wfn_a_read, wfn_b_read), aux = hamil
+    aux_inv=np.linalg.inv(aux["orth_mat"])
+    print("===========================")
+    enuc_icf    = gto.energy_nuc(mol)
+    print("nuclear repulsion this script:", enuc_icf)
+    print("nuclear repulsion read:", enuc_read)
+    print("===========================")
+    #
+    ###############################
+    #check orthornormal basis and get basis trans matrix
+    counter = 0.0
+    test_matrx=np.array(canonic.XT.conj().T - aux["orth_mat"])
+    for i in range(test_matrx.shape[0]): 
+        for j in range(test_matrx.shape[1]): 
+            counter += abs(test_matrx[i,j])
+            if abs(test_matrx[i,j]) <= 10e-7:
+                test_matrx[i,j] = 0.0
+    print("absSum(canonic.XT.conj().T - aux): ",counter)
+    print("===========================")
+    HAFQMC2AFQMC_matrix_temp = np.dot( canonic.XT, aux_inv.conj().T  )
+    HAFQMC2AFQMC_matrix = np.zeros((2*canonic.L, 2*canonic.L),dtype=np.complex128)
+    HAFQMC2AFQMC_matrix[0:canonic.L, 0:canonic.L] = HAFQMC2AFQMC_matrix_temp
+    HAFQMC2AFQMC_matrix[canonic.L:2*canonic.L, canonic.L:2*canonic.L] = HAFQMC2AFQMC_matrix_temp
+    #
+    h1e_read_trans = np.dot(HAFQMC2AFQMC_matrix_temp,np.dot(np.array(h1e_read),HAFQMC2AFQMC_matrix_temp.conj().T))
+    counter = 0.0
+    test_matrx=np.array(h1e_read_trans - t)
+    for i in range(test_matrx.shape[0]): 
+        for j in range(test_matrx.shape[1]): 
+            counter += abs(test_matrx[i,j])
+            if abs(test_matrx[i,j]) <= 10e-7:
+                test_matrx[i,j] = 0.0
+    print("absSum(h1e_read_trans - t): ",counter)
+    print("===========================")
+    ###############################
+    #check wfn_a, wfn_b
+    wfn_read = np.zeros((2*wfn_a_read.shape[0], wfn_a_read.shape[1] + wfn_b_read.shape[1]),dtype=np.complex128)
+    for i in range(wfn_a_read.shape[0]):
+        for j in range(wfn_a_read.shape[1]):
+            wfn_read[i,j]=wfn_a_read[i,j]
+    for i in range(wfn_b_read.shape[0]):
+        for j in range(wfn_b_read.shape[1]):    
+            wfn_read[i+wfn_a_read.shape[0],j+wfn_a_read.shape[1]]=wfn_b_read[i,j]
+    wfn_read_trans = np.dot(HAFQMC2AFQMC_matrix,wfn_read)
+    #
+    wfn_a_icf = rhf.mo_coeff[:, 0:Nup]
+    wfn_b_icf = rhf.mo_coeff[:, 0:Ndn]
+    wfn_a_icf = np.dot( canonic.XInv, wfn_a_icf )
+    wfn_b_icf = np.dot( canonic.XInv, wfn_b_icf )
+    wfn_icf = np.zeros((2*wfn_a_icf.shape[0], wfn_a_icf.shape[1] + wfn_b_read.shape[1]),dtype=np.complex128)
+    for i in range(wfn_a_icf.shape[0]):
+        for j in range(wfn_a_icf.shape[1]):
+            wfn_icf[i,j]=wfn_a_icf[i,j]
+    for i in range(wfn_b_icf.shape[0]):
+        for j in range(wfn_b_icf.shape[1]):    
+            wfn_icf[i+wfn_a_icf.shape[0],j+wfn_a_icf.shape[1]]=wfn_b_icf[i,j]
+    #
+    counter = 0.0
+    test_matrx=np.array(wfn_read_trans - wfn_icf)
+    for i in range(test_matrx.shape[0]): 
+        for j in range(test_matrx.shape[1]): 
+            counter += abs(test_matrx[i,j])
+            if abs(test_matrx[i,j]) <= 10e-7:
+                test_matrx[i,j] = 0.0
+    print("absSum(wfn_read_trans - wfn): ",counter)
+    print("===========================")
+    ###############################
+    ceri_AO_read = np.einsum("kpr,pi,rl->kil", ceri_read, aux_inv.conj(), aux_inv)
+    eri_AO_read = np.einsum("kpr,kqs->prqs", np.array(ceri_AO_read), np.array(ceri_AO_read)) 
+    #
+    choleskyVecAO_matrix=np.array(choleskyVecAO)
+    choleskyVecAO_matrix = choleskyVecAO_matrix.reshape(choleskyNum, mol.nao, mol.nao)
+    eri_icf = np.einsum("kpr,kqs->prqs", choleskyVecAO_matrix, choleskyVecAO_matrix) 
+    #
+    counter = 0.0
+    test_matrx=np.array(eri_AO_read- eri_icf)
+    for i in range(test_matrx.shape[0]): 
+        for j in range(test_matrx.shape[1]): 
+            for k in range(test_matrx.shape[2]): 
+                for l in range(test_matrx.shape[3]):
+                    counter += abs(test_matrx[i,j,k,l])
+                    if abs(test_matrx[i,j,k,l]) <= 10e-7:
+                        test_matrx[i,j,k,l] = 0.0
+    print("absSum(eri_AO_read- eri_AO_icf): ",counter)
+    print("===========================")
+    #
+    ceri_trans_read = np.einsum("kpr,ip,rl->kil", ceri_read, HAFQMC2AFQMC_matrix_temp, HAFQMC2AFQMC_matrix_temp.conj().T)
+    eri_trans_read = np.einsum("kpr,kqs->prqs", np.array(ceri_trans_read), np.array(ceri_trans_read)) 
+    #
+    choleskyVecMO_matrix=np.array(choleskyVecMO)
+    choleskyVecMO_matrix = choleskyVecMO_matrix.reshape(choleskyNum, mol.nao, mol.nao)
+    eri_icf = np.einsum("kpr,kqs->prqs", choleskyVecMO_matrix, choleskyVecMO_matrix) 
+    #
+    counter = 0.0
+    test_matrx=np.array(eri_trans_read- eri_icf)
+    for i in range(test_matrx.shape[0]): 
+        for j in range(test_matrx.shape[1]): 
+            for k in range(test_matrx.shape[2]): 
+                for l in range(test_matrx.shape[3]):
+                    counter += abs(test_matrx[i,j,k,l])
+                    if abs(test_matrx[i,j,k,l]) <= 10e-7:
+                        test_matrx[i,j,k,l] = 0.0
+    print("absSum(eri_trans_read- eri_icf): ",counter)
+    print("===========================")
+    ###############################
+    svdVecs=choleskyVecMO
+    svdNumber=choleskyNum
+    ############################
+    #ATTention: there is a transpose between python and c++ i/o trans
+    KT=np.zeros((2*canonic.L, 2*canonic.L),dtype=np.complex128)
+    KT[0:canonic.L,0:canonic.L]=K.transpose()
+    KT[canonic.L:2*canonic.L,canonic.L:2*canonic.L]=K.transpose()
+
+    svdVecsT=np.zeros((svdNumber, 2*canonic.L, 2*canonic.L),dtype=np.complex128)
+    for i in range(svdNumber):
+        svdVecsT[i,0:canonic.L,0:canonic.L]=svdVecs[i].reshape(canonic.L, canonic.L).transpose()
+        svdVecsT[i,canonic.L:2*canonic.L,canonic.L:2*canonic.L]=svdVecs[i].reshape(canonic.L, canonic.L).transpose()
+
+    f = h5py.File(name, "w")
+    f.create_dataset("L",              (1,),                                data=[2*canonic.L],           dtype='int')
+    f.create_dataset("Nup",              (1,),                                data=[Nup],           dtype='int')
+    f.create_dataset("Ndn",              (1,),                                data=[Ndn],           dtype='int')
+    f.create_dataset("N",            (1,),                                data=[Nup+Ndn],                     dtype='int')
+    f.create_dataset("svdNumber", (1,),                                data=[svdNumber],           dtype='int')
+    f.create_dataset("K_r",              ((2*canonic.L)**2,),                 data=KT.real.ravel(),                 dtype='float64')    #ATTention: there is a transpose between python and c++ i/o trans
+    f.create_dataset("svdVecs_r",   (svdNumber*(2*canonic.L)**2,), data=svdVecsT.real.ravel(),     dtype='float64')      #ATTention: there is a transpose between python and c++ i/o trans                    
+    f.create_dataset("svdBg_r",     (svdNumber,), data=np.zeros(svdNumber),   dtype='float64')
+    f.create_dataset("K_i",              ((2*canonic.L)**2,),                 data=KT.imag.ravel(),                 dtype='float64')    #ATTention: there is a transpose between python and c++ i/o trans
+    f.create_dataset("svdVecs_i",   (svdNumber*(2*canonic.L)**2,), data=svdVecsT.imag.ravel(),     dtype='float64')      #ATTention: there is a transpose between python and c++ i/o trans
+    f.create_dataset("svdBg_i",     (svdNumber,),                  data=np.zeros(svdNumber),   dtype='float64')
+    f.close()
+    #############################
+    hamil = t, choleskyVecMO_matrix, enuc_icf, (wfn_a_icf, wfn_b_icf), {"orth_mat": canonic.XT.conj().T} 
+    save_pickle("AFQMC_hamiltonian.pkl", hamil)
+
+
+def writeInputForModel_forGeneralHamiltonian_HAFQMC(mol=None, rhf=None, canonic=None, tol=1e-8, hamiltonian_path="AFQMC_hamiltonian.pkl", name="model_param"):
+    Nup = (mol.nelectron+mol.spin)//2
+    Ndn = (mol.nelectron-mol.spin)//2
+    choleskyNum, choleskyVecAO, choleskyVecMO = getCholeskyMO_AO(mol, canonic, tol)
+    #
+    t = np.dot( canonic.XT, np.dot( rhf.get_hcore(), canonic.X ) )
+    #
+    K = t.copy()
+    for i in range(choleskyNum):
+        oneVec = choleskyVecMO[i].reshape(canonic.L, canonic.L)
+        K += (-0.5)*np.dot( oneVec, oneVec )
+    ###############################
+    wfn_a_icf = rhf.mo_coeff[:, 0:Nup]
+    wfn_b_icf = rhf.mo_coeff[:, 0:Ndn]
+    wfn_a_icf = np.dot( canonic.XInv, wfn_a_icf )
+    wfn_b_icf = np.dot( canonic.XInv, wfn_b_icf )
+    #
+    choleskyVecMO_matrix=np.array(choleskyVecMO)
+    choleskyVecMO_matrix = choleskyVecMO_matrix.reshape(choleskyNum, mol.nao, mol.nao)
+    ###############################
+    svdVecs=choleskyVecMO
+    svdNumber=choleskyNum
+    ############################
+    #ATTention: there is a transpose between python and c++ i/o trans
+    KT=np.zeros((2*canonic.L, 2*canonic.L),dtype=np.complex128)
+    KT[0:canonic.L,0:canonic.L]=K.transpose()
+    KT[canonic.L:2*canonic.L,canonic.L:2*canonic.L]=K.transpose()
+    #
+    svdVecsT=np.zeros((svdNumber, 2*canonic.L, 2*canonic.L),dtype=np.complex128)
+    for i in range(svdNumber):
+        svdVecsT[i,0:canonic.L,0:canonic.L]=svdVecs[i].reshape(canonic.L, canonic.L).transpose()
+        svdVecsT[i,canonic.L:2*canonic.L,canonic.L:2*canonic.L]=svdVecs[i].reshape(canonic.L, canonic.L).transpose()
+    #
+    f = h5py.File(name, "w")
+    f.create_dataset("L",              (1,),                                data=[2*canonic.L],           dtype='int')
+    f.create_dataset("Nup",              (1,),                                data=[Nup],           dtype='int')
+    f.create_dataset("Ndn",              (1,),                                data=[Ndn],           dtype='int')
+    f.create_dataset("N",            (1,),                                data=[Nup+Ndn],                     dtype='int')
+    f.create_dataset("svdNumber", (1,),                                data=[svdNumber],           dtype='int')
+    f.create_dataset("K_r",              ((2*canonic.L)**2,),                 data=KT.real.ravel(),                 dtype='float64')    #ATTention: there is a transpose between python and c++ i/o trans
+    f.create_dataset("svdVecs_r",   (svdNumber*(2*canonic.L)**2,), data=svdVecsT.real.ravel(),     dtype='float64')      #ATTention: there is a transpose between python and c++ i/o trans                    
+    f.create_dataset("svdBg_r",     (svdNumber,), data=np.zeros(svdNumber),   dtype='float64')
+    f.create_dataset("K_i",              ((2*canonic.L)**2,),                 data=KT.imag.ravel(),                 dtype='float64')    #ATTention: there is a transpose between python and c++ i/o trans
+    f.create_dataset("svdVecs_i",   (svdNumber*(2*canonic.L)**2,), data=svdVecsT.imag.ravel(),     dtype='float64')      #ATTention: there is a transpose between python and c++ i/o trans
+    f.create_dataset("svdBg_i",     (svdNumber,),                  data=np.zeros(svdNumber),   dtype='float64')
+    f.close()
+    #############################
+    enuc_icf    = gto.energy_nuc(mol)
+    hamil = t, choleskyVecMO_matrix, enuc_icf, (wfn_a_icf, wfn_b_icf), {"orth_mat": canonic.XT.conj().T} 
+    save_pickle(hamiltonian_path, hamil)
+
+
+def writeInputForModel_fromHAFQMC_forGeneralHamiltonian_slice1(scale=1.0, mol=None, canonic=None, tol=1e-8, hamiltonian_path="hamiltonian.pkl", param_path="ckpt_2000.pkl",  name="model_param"):
+    #|\phiT> = \prod [exp(-tT)exp(-tV)]|\phi_0>
+    def save_pickle(filename, data):
+        with open(filename, 'wb') as file:
+            pickle.dump(data, file)
+    def load_pickle(filename):
+        with open(filename, 'rb') as file:
+            return pickle.load(file)
+        
+    # also 2.4, 2.7, 3.0, 3.6, 4.2
+    hamil = load_pickle(hamiltonian_path)
+    ckpt = load_pickle(param_path)
+    params = ckpt[1][1]['params']['ansatz']
+
+    # see https://github.com/y1xiaoc/hafqmc/blob/master/hafqmc/hamiltonian.py#L334
+    # for detailed meaning of the arrays
+    h1e, ceri, enuc, (wfn_a, wfn_b), aux = hamil
+
+    # basis size 28
+    # number of electrons 14 (7 up + 7 down)
+    print('shape of the hamiltonian arrays:')
+    print('one body operator K (h1e):', h1e.shape)
+    print('two body operator after cholesky (ceri):', ceri.shape)
+    print('nuclear contribution of energy (enuc):', enuc)
+    print('spin up wfn coeffs (wfn_a):', wfn_a.shape)
+    print('spin down wfn coeffs (wfn_b):', wfn_b.shape)
+    print('ao2mo rotaton matrix ("orth_mat"):', aux['orth_mat'].shape)
+
+    # remove extra layers
+    # params = params['params']['ansatz']
+
+    # one body operators at different slices, in GHF
+    hmf=[]
+    hmf0 = params['propagators_0']['hmf_ops_0']['hmf']
+    hmf.append(hmf0)
+    hmf1 = params['propagators_0']['hmf_ops_1']['hmf']
+    hmf.append(hmf1)
+    print(f"{hmf0.shape = }")
+
+    # decompsed two body operators, same for all slices, 100 aux fields
+    vhs=[]
+    vhs1 = params['propagators_0']['vhs_ops_0']['vhs']
+    # vhs0 = np.zeros((vhs1.shape[0], vhs1.shape[1], vhs1.shape[2]),dtype=np.complex128)
+    # vhs.append(vhs0)
+    vhs.append(vhs1)
+    vhs.append(vhs1)
+    print(f"{vhs1.shape = }")
+
+    # time steps, 4 one body steps, 3 two body steps, ts_v is after sqrt
+    ts_h = params['propagators_0']['ts_h']
+    ts_v = params['propagators_0']['ts_v']
+    ts_v_icf = np.zeros(( ts_v.shape[0] + 1),dtype=np.complex128)
+    #
+    ts_v_icf[0:1] = ts_v
+    ts_v_icf[1] = 0.0
+    print("ts_v_icf: ",ts_v_icf)
+    print(f"{ts_h.shape = }")
+    print(f"{ts_v.shape = }")
+    #
+    Nup = (mol.nelectron+mol.spin)//2
+    Ndn = (mol.nelectron-mol.spin)//2
+    #
+    #####################################
+    #first three slice for K+V
+    #####################################
+    aux_inv=np.linalg.inv(aux["orth_mat"])
+    HAFQMC2AFQMC_matrix_temp = np.dot( canonic.XT, aux_inv.conj().T  )
+    HAFQMC2AFQMC_matrix = np.zeros((2*canonic.L, 2*canonic.L),dtype=np.complex128)
+    HAFQMC2AFQMC_matrix[0:canonic.L, 0:canonic.L] = HAFQMC2AFQMC_matrix_temp
+    HAFQMC2AFQMC_matrix[canonic.L:2*canonic.L, canonic.L:2*canonic.L] = HAFQMC2AFQMC_matrix_temp
+    for Jastrow in [0,1]:
+        choleskyNum = vhs[Jastrow].shape[0]
+        #####################################
+        choleskyVecMO_temp = np.array(vhs[Jastrow] * ts_v_icf[Jastrow])
+        # choleskyVecMO_temp = np.array(vhs[Jastrow] * 0.0)
+        #
+        choleskyVecMO = choleskyVecMO_temp
+        for i in range(choleskyVecMO.shape[0]):
+            choleskyVecMO[i] = np.dot( HAFQMC2AFQMC_matrix, np.dot( choleskyVecMO_temp[i], HAFQMC2AFQMC_matrix.conj().T ) )
+        #####################################
+        K_temp = np.array(hmf[Jastrow] *  ts_h[Jastrow])
+        K = np.dot( HAFQMC2AFQMC_matrix, np.dot( K_temp, HAFQMC2AFQMC_matrix.conj().T ) )
+        #
+        svdVecs=choleskyVecMO
+        svdNumber=choleskyNum
+        ############################
+        #ATTention: there is a transpose between python and c++ i/o trans
+        KT=np.zeros((2*canonic.L, 2*canonic.L),dtype=np.complex128)
+        KT=K.transpose()
+
+        svdVecsT=np.zeros((svdNumber, 2*canonic.L, 2*canonic.L),dtype=np.complex128)
+        for i in range(svdNumber):
+            svdVecsT[i,0:2*canonic.L,0:2*canonic.L]=svdVecs[i].transpose()
+
+        f = h5py.File(name+"_"+str(Jastrow), "w")
+        f.create_dataset("L",              (1,),                                data=[2*canonic.L],           dtype='int')
+        f.create_dataset("Nup",              (1,),                                data=[Nup],           dtype='int')
+        f.create_dataset("Ndn",              (1,),                                data=[Ndn],           dtype='int')
+        f.create_dataset("N",            (1,),                                data=[Nup+Ndn],                     dtype='int')
+        f.create_dataset("svdNumber", (1,),                                data=[svdNumber],           dtype='int')
+        f.create_dataset("K_r",              ((2*canonic.L)**2,),                 data=KT.real.ravel(),                 dtype='float64')    #ATTention: there is a transpose between python and c++ i/o trans
+        f.create_dataset("svdVecs_r",   (svdNumber*(2*canonic.L)**2,), data=svdVecsT.real.ravel(),     dtype='float64')      #ATTention: there is a transpose between python and c++ i/o trans                    
+        f.create_dataset("svdBg_r",     (svdNumber,), data=np.zeros(svdNumber),   dtype='float64')
+        f.create_dataset("K_i",              ((2*canonic.L)**2,),                 data=KT.imag.ravel(),                 dtype='float64')    #ATTention: there is a transpose between python and c++ i/o trans
+        f.create_dataset("svdVecs_i",   (svdNumber*(2*canonic.L)**2,), data=svdVecsT.imag.ravel(),     dtype='float64')      #ATTention: there is a transpose between python and c++ i/o trans
+        f.create_dataset("svdBg_i",     (svdNumber,),                  data=np.zeros(svdNumber),   dtype='float64')
+        f.close()
+
+def writeUHFSD_fromHAFQMC_icfTrans(mol=None, canonic=None, hamiltonian_path="hamiltonian.pkl", param_path="ckpt_2000.pkl", filename=None, noise=0.0):
+    def save_pickle(filename, data):
+        with open(filename, 'wb') as file:
+            pickle.dump(data, file)
+    def load_pickle(filename):
+        with open(filename, 'rb') as file:
+            return pickle.load(file)
+        
+    # also 2.4, 2.7, 3.0, 3.6, 4.2
+    hamil = load_pickle(hamiltonian_path)
+    ckpt = load_pickle(param_path)
+    params = ckpt[1][1]['params']['ansatz']
+
+    h1e, ceri, enuc, (wfn_a, wfn_b), aux = hamil
+
+    # initial wavefunction in GHF to start projection
+    wfn0_a = np.array(params['wfn_a'])
+    wfn0_b = np.array(params['wfn_b'])
+    wfn0 = np.zeros((2*wfn0_a.shape[0], wfn0_a.shape[1] + wfn0_b.shape[1]),dtype=np.complex128)
+    for i in range(wfn0_a.shape[0]):
+        for j in range(wfn0_a.shape[1]):
+            wfn0[i,j]=wfn0_a[i,j]
+    for i in range(wfn0_b.shape[0]):
+        for j in range(wfn0_b.shape[1]):
+            wfn0[i+wfn0_a.shape[0],j+wfn0_a.shape[1]]=wfn0_b[i,j]
+    #
+    aux_inv=np.linalg.inv(aux["orth_mat"])
+    HAFQMC2AFQMC_matrix_temp = np.dot( canonic.XT, aux_inv.conj().T  )
+    #
+    HAFQMC2AFQMC_matrix = np.zeros((2*canonic.L, 2*canonic.L),dtype=np.complex128)
+    HAFQMC2AFQMC_matrix[0:canonic.L, 0:canonic.L] = HAFQMC2AFQMC_matrix_temp
+    HAFQMC2AFQMC_matrix[canonic.L:2*canonic.L, canonic.L:2*canonic.L] = HAFQMC2AFQMC_matrix_temp
+    wf = np.dot( HAFQMC2AFQMC_matrix, wfn0 )
+    #
+    print(f"{wf.shape = }")
+    #
+    Nup = (mol.nelectron+mol.spin)//2
+    Ndn = (mol.nelectron-mol.spin)//2
+
+    f = open(filename, 'w')
+
+    f.write('{:26.18e} {:26.18e} \n'.format(0.0,0.0))
+
+    f.write('{:26d} \n'.format(2))
+    f.write('{:26d} {:26d} \n'.format(2*canonic.L,Nup+Ndn))
+    for i in range(Nup+Ndn):
+        for j in range(2*canonic.L):
+                f.write( '{:26.18e} {:26.18e} \n'.format( wf[j,i].real+noise*random.random(),0.0 ) )
+    f.close()
+
+def writeUHFSD_fromHAFQMC_icfTrans_mix(mol=None, canonic=None, hamiltonian_path="hamiltonian.pkl", param_path="ckpt_2000.pkl", filename=None, noise=0.0):
+    def save_pickle(filename, data):
+        with open(filename, 'wb') as file:
+            pickle.dump(data, file)
+    def load_pickle(filename):
+        with open(filename, 'rb') as file:
+            return pickle.load(file)
+        
+    # also 2.4, 2.7, 3.0, 3.6, 4.2
+    hamil = load_pickle(hamiltonian_path)
+    ckpt = load_pickle(param_path)
+    params = ckpt[1][1]['params']['ansatz']
+
+    h1e, ceri, enuc, (wfn_a, wfn_b), aux = hamil
+
+    # initial wavefunction in GHF to start projection
+    wfn0_a = np.array(params['wfn_a'])
+    wfn0 = wfn0_a
+    # print(wfn0)
+    #
+    aux_inv=np.linalg.inv(aux["orth_mat"])
+    HAFQMC2AFQMC_matrix_temp = np.dot( canonic.XT, aux_inv.conj().T  )
+    #
+    HAFQMC2AFQMC_matrix = np.zeros((2*canonic.L, 2*canonic.L),dtype=np.complex128)
+    HAFQMC2AFQMC_matrix[0:canonic.L, 0:canonic.L] = HAFQMC2AFQMC_matrix_temp
+    HAFQMC2AFQMC_matrix[canonic.L:2*canonic.L, canonic.L:2*canonic.L] = HAFQMC2AFQMC_matrix_temp
+    wf = np.dot( HAFQMC2AFQMC_matrix, wfn0 )
+    #
+    print(f"{wf.shape = }")
+    #
+    Nup = (mol.nelectron+mol.spin)//2
+    Ndn = (mol.nelectron-mol.spin)//2
+
+    f = open(filename, 'w')
+
+    f.write('{:26.18e} {:26.18e} \n'.format(0.0,0.0))
+
+    f.write('{:26d} \n'.format(2))
+    f.write('{:26d} {:26d} \n'.format(2*canonic.L,Nup+Ndn))
+    for i in range(Nup+Ndn):
+        for j in range(2*canonic.L):
+                f.write( '{:26.18e} {:26.18e} \n'.format( wf[j,i].real+noise*random.random(),0.0 ) )
+    f.close()
+
+def writeUHFSD_fromHAFQMC_icfRead(mol=None, canonic=None, param_path="ckpt_2000.pkl", filename=None, noise=0.0):
+    def save_pickle(filename, data):
+        with open(filename, 'wb') as file:
+            pickle.dump(data, file)
+    def load_pickle(filename):
+        with open(filename, 'rb') as file:
+            return pickle.load(file)
+    # also 2.4, 2.7, 3.0, 3.6, 4.2
+    ckpt = load_pickle(param_path)
+    params = ckpt[1][1]['params']['ansatz']
+
+    # initial wavefunction in GHF to start projection
+    wfn0_a = np.array(params['wfn_a'])
+    wfn0_b = np.array(params['wfn_b'])
+    wfn0 = np.zeros((2*wfn0_a.shape[0], 2*wfn0_a.shape[1]),dtype=np.complex128)
+    for i in range(wfn0_a.shape[0]):
+        for j in range(wfn0_a.shape[1]):
+            wfn0[i,j]=wfn0_a[i,j]
+            wfn0[i+wfn0_a.shape[0],j+wfn0_a.shape[1]]=wfn0_b[i,j]
+    #
+    wf = wfn0
+    #
+    print(f"{wf.shape = }")
+    #
+    Nup = (mol.nelectron+mol.spin)//2
+    Ndn = (mol.nelectron-mol.spin)//2
+
+    f = open(filename, 'w')
+
+    f.write('{:26.18e} {:26.18e} \n'.format(0.0,0.0))
+
+    f.write('{:26d} \n'.format(2))
+    f.write('{:26d} {:26d} \n'.format(2*canonic.L,Nup+Ndn))
+    for i in range(Nup+Ndn):
+        for j in range(2*canonic.L):
+                f.write( '{:26.18e} {:26.18e} \n'.format( wf[j,i].real+noise*random.random(),0.0 ) )
+    f.close()
+
+###################################################################################
+###################################################################################
+###################################################################################
+
+mol = setupMolecule(one_atom, chrg, spn, basis)
+rhf  = doROHFCalculation(basis, one_atom, chrg, mol)
+##################################################################
+#save AFQMC_rhf.chk/AFQMC_hamiltonian.pkl for HAFQMC
+##################################################################
+# rhf = scf.RHF(mol).set(chkfile ='AFQMC_rhf.chk')
+# rhf.kernel()
+# canonic = CanonicalBais(mol, rhf, 1e-8)
+# writeInputForModel_forGeneralHamiltonian_HAFQMC(mol, rhf, canonic, 1e-12, "AFQMC_hamiltonian.pkl", "model_param")
+##################################################################
+#load AFQMC_rhf.chk/AFQMC_hamiltonian.pkl/checkpoint.pkl
+##################################################################
+rhf.__dict__.update(pyscf.scf.chkfile.load(Jastrow_rhf_address, 'scf'))
+canonic = CanonicalBais(mol, rhf, 1e-8)
+writeInputForModel_forGeneralHamiltonian_load_hamiltonian_and_selfCheck(mol, rhf, canonic, 1e-6, Jastrow_model_address, "model_param")
+#generate hf and hamiltonian input for both HAFQMC and AFQMC (HAFQMC and AFQMC take exatltly the same second quantized Hamiltonian with exatltly the same MO)
+writeInputForModel_fromHAFQMC_forGeneralHamiltonian_slice1(1.0, mol, canonic, 1e-12, Jastrow_model_address, Jastrow_address, "model_Jastrow_param")
+for i in range(numOfChains):
+    writeUHFSD_fromHAFQMC_icfTrans(mol, canonic, Jastrow_model_address, Jastrow_address, "phiT_"+str(i)+".dat")
+
+writeUHFSD_fromHAFQMC_icfTrans(mol, canonic, Jastrow_model_address, Jastrow_address, "phi.dat")
+#INFO: ******************** input file end ********************
+
+
+System: uname_result(system='Linux', node='h2501.para.cstc', release='3.10.0-1160.118.1.el7.x86_64', version='#1 SMP Wed Apr 24 16:01:50 UTC 2024', machine='x86_64')  Threads 24
+Python 3.9.6 (default, Jul 19 2021, 14:29:39) 
+[GCC 4.8.5 20150623 (Red Hat 4.8.5-39)]
+numpy 2.0.2  scipy 1.13.1  h5py 3.12.1
+Date: Thu Feb 20 19:13:05 2025
+PySCF version 2.7.0
+PySCF path  /public1/home/sc31257/Global/lib_install/python_pip/pyscf/pyscf
+
+[CONFIG] conf_file None
+[INPUT] verbose = 4
+[INPUT] num. atoms = 2
+[INPUT] num. electrons = 18
+[INPUT] charge = 0
+[INPUT] spin (= nelec alpha-beta = 2S) = 2
+[INPUT] symmetry False subgroup None
+[INPUT] Mole.unit = angstrom
+[INPUT] Symbol           X                Y                Z      unit          X                Y                Z       unit  Magmom
+[INPUT]  1 Ti     0.000000000000   0.000000000000   0.000000000000 AA    0.000000000000   0.000000000000   0.000000000000 Bohr   0.0
+[INPUT]  2 O      0.000000000000   0.000000000000   1.623000000000 AA    0.000000000000   0.000000000000   3.067025500169 Bohr   0.0
+
+nuclear repulsion = 23.4755139779667
+number of shells = 24
+number of NR pGTOs = 334
+number of NR cGTOs = 76
+basis = {'Ti': [[0, [37.13946663, 0.002411], [11.66061728, -0.575963], [8.9751153, 2.645948], [7.67011905, -2.362876], [3.44923714, -0.059842], [1.58705441, 0.244002], [0.95387432, 0.58593], [0.47300537, 0.378609], [0.2203041, 0.031099], [0.10349534, 0.004602], [0.04822069, 0.000609], [0.0226639, 0.001044]], [0, [37.13946663, -0.000363], [11.66061728, 0.129591], [8.9751153, -0.625086], [7.67011905, 0.572499], [3.44923714, 0.016652], [1.58705441, -0.073052], [0.95387432, -0.203234], [0.47300537, -0.251131], [0.2203041, -0.044619], [0.10349534, 0.38905], [0.04822069, 0.591401], [0.0226639, 0.208165]], [0, [37.13946663, -0.001116], [11.66061728, 0.508798], [8.9751153, -2.594276], [7.67011905, 2.468935], [3.44923714, 0.026471], [1.58705441, -1.13173], [0.95387432, -0.392618], [0.47300537, 0.479234], [0.2203041, 0.927545], [0.10349534, 0.387481], [0.04822069, -0.588339], [0.0226639, -0.396132]], [0, [0.0226639, 1.0]], [0, [0.01065211, 1.0]], [1, [44.38520603, 0.000557], [23.85822456, -0.004857], [12.73507149, 0.027448], [6.00842867, -0.150306], [3.96301478, 0.092203], [2.13751474, 0.210744], [1.20712576, 0.397756], [0.62000194, 0.354359], [0.30900057, 0.130823], [0.12918293, 0.012952], [0.05400711, -0.000125], [0.02257859, 0.000245]], [1, [44.38520603, -7.7e-05], [23.85822456, 0.000906], [12.73507149, -0.006126], [6.00842867, 0.038285], [3.96301478, -0.027356], [2.13751474, -0.059665], [1.20712576, -0.115513], [0.62000194, -0.130421], [0.30900057, 0.025358], [0.12918293, 0.394962], [0.05400711, 0.54831], [0.02257859, 0.169017]], [1, [44.38520603, 0.000315], [23.85822456, -0.004549], [12.73507149, 0.035032], [6.00842867, -0.269496], [3.96301478, 0.220568], [2.13751474, 0.779761], [1.20712576, 0.240982], [0.62000194, -0.859612], [0.30900057, -0.578446], [0.12918293, 0.638634], [0.05400711, 0.393609], [0.02257859, -0.00321]], [1, [0.02257859, 1.0]], [1, [0.00943936, 1.0]], [2, [29.31465998, -0.000519], [13.63067536, -0.007186], [8.04907964, 0.095441], [3.25682476, 0.170565], [1.474054, 0.27882], [0.66141289, 0.324798], [0.29673638, 0.280135], [0.13456087, 0.172066], [0.06095666, 0.058237], [0.02784531, 0.004588]], [2, [29.31465998, 0.002631], [13.63067536, -0.005278], [8.04907964, -0.065213], [3.25682476, -0.254704], [1.474054, -0.486598], [0.66141289, 0.011811], [0.29673638, 0.338416], [0.13456087, 0.386607], [0.06095666, 0.182743], [0.02784531, 0.018903]], [2, [0.02784531, 1.0]], [2, [0.01271987, 1.0]], [3, [1.635357, 1.0]], [3, [0.74703931, 1.0]]], 'O': [[0, [57.663349, -0.002794], [35.726816, 0.023976], [22.453757, -0.115974], [14.732301, 0.288033], [9.739917, -0.274786], [5.042008, -0.083789], [2.157818, 0.063778], [1.002916, 0.410182], [0.421839, 0.504044], [0.173041, 0.172152]], [0, [0.222099, 1.0]], [0, [0.08884, 1.0]], [1, [52.47406, -0.000522], [32.138432, 0.004857], [19.458579, -0.027749], [11.839344, 0.074258], [7.91003, 0.014369], [3.670858, 0.153479], [1.53966, 0.283685], [0.647119, 0.358201], [0.267853, 0.29559], [0.107198, 0.104889]], [1, [0.252604, 1.0]], [1, [0.101042, 1.0]], [2, [1.223113, 1.0]], [2, [0.489245, 1.0]]]}
+ecp = {'Ti': [10, [[-1, [[], [[8.52499277, 12.0]], [[15.2433413, 2048.39512837], [9.82605516, -812.71625987], [13.73638629, -6663.62886396], [12.6545051, 5396.93874773]], [[7.54790686, 102.29991323]], [], [], []]], [0, [[], [], [[6.07854372, -5355.67455847], [6.60870356, 4802.76911085], [5.40803832, 1304.66429039], [10.43037595, -1133.61681175], [18.40796253, -258.77562194], [15.384288, 672.53886697]], [], [], [], []]], [1, [[], [], [[9.60319864, 56981.17339652], [9.66270511, -57002.97844363], [15.06515908, 1335.72576887], [16.36599976, -813.49634683], [7.86420177, -720.45341501], [10.25452653, 239.69852194]], [], [], [], []]], [2, [[], [], [[10.56650824, -4262.72074057], [2.71368379, -1.34753473], [9.33780917, 1569.82864567], [31.60560687, -0.4538755], [12.28030141, 5034.44351544], [13.3677017, -2350.67846378]], [], [], [], []]]]], 'O': [2, [[-1, [[], [[10.27717748, 6.0]], [[15.99566749, 1232.50197768], [10.46901775, -696.47008301], [14.6384801, -2654.22657081], [12.57591181, 2101.67732548]], [[7.77739102, 61.66306486]], [], [], []]], [0, [[], [], [[12.39426073, -656683.37638839], [12.38126171, 657858.57667068], [8.57671033, 511.50098405], [9.89256508, -2579.54665641], [28.05641604, -57.68129584], [17.24753607, 970.30940152]], [], [], [], []]], [1, [[], [], [[14.78918914, -363027.24258186], [14.82014018, 361852.52314043], [22.89622221, -1300.20069256], [8.51331893, -181.96869573], [11.48609758, 2194.87589959], [27.22017524, 451.19906206]], [], [], [], []]]]]}
+CPU time:         6.11
+Molecule [geometry in Bohr]
+TiO 1.623
+Nuclear repulsion energy =   2.347551397796673101e+01 
+AO basis  vdz
+0         0 Ti 3s         
+1         0 Ti 4s         
+2         0 Ti 5s         
+3         0 Ti 6s         
+4         0 Ti 7s         
+5         0 Ti 3px        
+6         0 Ti 3py        
+7         0 Ti 3pz        
+8         0 Ti 4px        
+9         0 Ti 4py        
+10        0 Ti 4pz        
+11        0 Ti 5px        
+12        0 Ti 5py        
+13        0 Ti 5pz        
+14        0 Ti 6px        
+15        0 Ti 6py        
+16        0 Ti 6pz        
+17        0 Ti 7px        
+18        0 Ti 7py        
+19        0 Ti 7pz        
+20        0 Ti 3dxy       
+21        0 Ti 3dyz       
+22        0 Ti 3dz^2      
+23        0 Ti 3dxz       
+24        0 Ti 3dx2-y2    
+25        0 Ti 4dxy       
+26        0 Ti 4dyz       
+27        0 Ti 4dz^2      
+28        0 Ti 4dxz       
+29        0 Ti 4dx2-y2    
+30        0 Ti 5dxy       
+31        0 Ti 5dyz       
+32        0 Ti 5dz^2      
+33        0 Ti 5dxz       
+34        0 Ti 5dx2-y2    
+35        0 Ti 6dxy       
+36        0 Ti 6dyz       
+37        0 Ti 6dz^2      
+38        0 Ti 6dxz       
+39        0 Ti 6dx2-y2    
+40        0 Ti 4f-3       
+41        0 Ti 4f-2       
+42        0 Ti 4f-1       
+43        0 Ti 4f+0       
+44        0 Ti 4f+1       
+45        0 Ti 4f+2       
+46        0 Ti 4f+3       
+47        0 Ti 5f-3       
+48        0 Ti 5f-2       
+49        0 Ti 5f-1       
+50        0 Ti 5f+0       
+51        0 Ti 5f+1       
+52        0 Ti 5f+2       
+53        0 Ti 5f+3       
+54        1 O 2s          
+55        1 O 3s          
+56        1 O 4s          
+57        1 O 2px         
+58        1 O 2py         
+59        1 O 2pz         
+60        1 O 3px         
+61        1 O 3py         
+62        1 O 3pz         
+63        1 O 4px         
+64        1 O 4py         
+65        1 O 4pz         
+66        1 O 3dxy        
+67        1 O 3dyz        
+68        1 O 3dz^2       
+69        1 O 3dxz        
+70        1 O 3dx2-y2     
+71        1 O 4dxy        
+72        1 O 4dyz        
+73        1 O 4dz^2       
+74        1 O 4dxz        
+75        1 O 4dx2-y2     
+charge                  0
+spin                    2
+orbitals               76
+alpha electrons        10
+beta  electrons         8
+
+
+modified dm up [1.00145623e+00 1.05052502e+00 9.87874971e-04 4.35434266e-02
+ 8.84572303e-04 1.00273437e+00 1.00273437e+00 1.01767141e+00
+ 1.06317311e-02 1.06317311e-02 2.82178898e-01 9.33475272e-05
+ 9.33475272e-05 2.06992266e-04 1.33031081e-03 1.33031081e-03
+ 1.01140798e-02 6.46930196e-05 6.46930196e-05 1.48935480e-04
+ 1.00658111e+00 8.15184390e-02 2.39205609e-01 8.15184390e-02
+ 1.50717886e-14 4.43779607e-03 2.60090804e-04 3.33175620e-04
+ 2.60090804e-04 6.64481842e-17 2.02112043e-03 4.91722710e-06
+ 1.13565259e-04 4.91722710e-06 3.02627343e-17 4.23822477e-04
+ 1.75871749e-06 5.68827589e-06 1.75871749e-06 6.34599959e-18
+ 1.00130690e-05 7.92133235e-06 9.06393118e-07 1.64926933e-05
+ 9.06393118e-07 1.18608065e-19 1.00130690e-05 1.94370032e-05
+ 7.71140190e-05 3.71751437e-04 5.27970973e-04 3.71751437e-04
+ 1.15464741e-18 1.94370032e-05 8.81893201e-01 5.96591859e-03
+ 9.37117101e-02 6.72837166e-01 6.72837166e-01 7.34088527e-01
+ 3.56617463e-03 3.56617463e-03 1.82996275e-03 2.74481407e-05
+ 2.74481407e-05 7.21496070e-03 2.63706960e-05 8.70471570e-05
+ 2.94397457e-04 8.70471570e-05 3.94855014e-19 1.30433594e-05
+ 1.32894418e-03 4.72028542e-04 1.32894418e-03 1.95301492e-19]
+modified dm down [1.00126159e+00 1.35565410e-01 9.73786860e-04 2.23531023e-02
+ 5.94943167e-04 1.00273437e+00 1.00273437e+00 1.01760654e+00
+ 1.06317311e-02 1.06317311e-02 3.83426502e-02 9.33475272e-05
+ 9.33475272e-05 1.81379775e-04 1.33031081e-03 1.33031081e-03
+ 5.12637951e-03 6.46930196e-05 6.46930196e-05 1.24997865e-04
+ 2.51719737e-31 8.15184390e-02 1.90763367e-01 8.15184390e-02
+ 2.39206408e-31 1.35746343e-31 2.60090804e-04 1.66893303e-05
+ 2.60090804e-04 1.59589091e-32 1.34821581e-31 4.91722710e-06
+ 6.94933564e-05 4.91722710e-06 2.07256256e-31 2.22387650e-31
+ 1.75871749e-06 3.74286736e-06 1.75871749e-06 2.91392780e-32
+ 1.00130690e-05 1.46980709e-32 9.06393118e-07 1.64882468e-05
+ 9.06393118e-07 4.01549843e-34 1.00130690e-05 1.94370032e-05
+ 6.59399243e-32 3.71751437e-04 5.26694487e-04 3.71751437e-04
+ 1.18542574e-32 1.94370032e-05 8.78213561e-01 5.20381973e-03
+ 8.99635559e-02 6.72837166e-01 6.72837166e-01 7.33841773e-01
+ 3.56617463e-03 3.56617463e-03 9.15386874e-04 2.74481407e-05
+ 2.74481407e-05 7.18846418e-03 3.04286927e-34 8.70471570e-05
+ 2.77730194e-04 8.70471570e-05 1.18952331e-33 1.15111054e-32
+ 1.32894418e-03 4.57521062e-04 1.32894418e-03 1.68466549e-32]
+
+WARN: Newton solver expects mo_coeff with mo_occ as initial guess but mo_occ is not found in the arguments.
+      The given argument is treated as density matrix.
+
+
+
+
+
+******** <class 'pyscf.soscf.newton_ah.SecondOrderROHF'> ********
+method = SecondOrderROHF
+initial guess = minao
+damping factor = 0
+level_shift factor = 0
+DIIS = <class 'pyscf.scf.diis.CDIIS'>
+diis_start_cycle = 1
+diis_space = 8
+diis_damp = 0
+SCF conv_tol = 1e-09
+SCF conv_tol_grad = None
+SCF max_cycles = 50
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = Tivdz0.chk
+max_memory 50000 MB (current use 74 MB)
+num. doubly occ = 8  num. singly occ = 2
+******** <class 'pyscf.scf.rohf.ROHF'> Newton solver flags ********
+SCF tol = 1e-09
+conv_tol_grad = None
+max. SCF cycles = 50
+direct_scf = True
+direct_scf_tol = 1e-13
+chkfile to save SCF result = Tivdz0.chk
+max_cycle_inner = 12
+max_stepsize = 0.05
+ah_start_tol = 1e+09
+ah_level_shift = 0
+ah_conv_tol = 1e-12
+ah_lindep = 1e-14
+ah_start_cycle = 1
+ah_max_cycle = 40
+ah_grad_trust_region = 2.5
+kf_interval = 4
+kf_trust_region = 5
+canonicalization = True
+max_memory 50000 MB (current use 74 MB)
+Set conv_tol_grad to 3.16228e-05
+  HOMO = -0.121260242075588  LUMO = 0.0128097382374989
+Initial guess E= -73.2697360571065  |g|= 5.92096e-05
+macro= 0  E= -73.2697360578995  delta_E= -7.92994e-10  |g|= 5.92096e-05  1 KF 4 JK
+macro= 1  E= -73.2697360578996  delta_E= -8.52651e-14  |g|= 2.30939e-06  1 KF 2 JK
+Canonicalize SCF orbitals
+macro X = 2  E=-73.2697360578996  |g|= 2.30939e-06  total 3 KF 9 JK
+converged SCF energy = -73.2697360578996
+**** SCF Summaries ****
+Total Energy =                         -73.269736057899564
+Nuclear Repulsion Energy =              23.475513977966731
+One-electron Energy =                 -170.579398102117125
+Two-electron Energy =                   73.834148066250833
+**** MO energy ****
+                Roothaan           | alpha              | beta
+MO #1   energy= -2.97370432552442  | -3.01263578326459  | -2.93477286778426  occ= 2
+MO #2   energy= -1.89389019476407  | -1.90834928000097  | -1.87943110952718  occ= 2
+MO #3   energy= -1.86058167235783  | -1.92155894682351  | -1.79960439789216  occ= 2
+MO #4   energy= -1.86058167235783  | -1.9215589468235   | -1.79960439789215  occ= 2
+MO #5   energy= -1.15667395345976  | -1.15882706565207  | -1.15452084126745  occ= 2
+MO #6   energy= -0.461701522509781 | -0.466911527102076 | -0.456491517917485 occ= 2
+MO #7   energy= -0.443248978233861 | -0.446053517837046 | -0.440444438630675 occ= 2
+MO #8   energy= -0.44324897823386  | -0.446053517837046 | -0.440444438630675 occ= 2
+MO #9   energy= -0.124430928053161 | -0.266524325253028 | 0.0176624691467054 occ= 1
+MO #10  energy= -0.121259649381222 | -0.457315049479495 | 0.214795750717046  occ= 1
+MO #11  energy= 0.0128094240270522 | 0.00748231678644412 | 0.0181365312676601 occ= 0
+MO #12  energy= 0.0128094240270528 | 0.00748231678644405 | 0.0181365312676607 occ= 0
+MO #13  energy= 0.015770939198491  | 0.0139289692582036 | 0.0176129091387786 occ= 0
+MO #14  energy= 0.0257511917747774 | 0.0248011293972932 | 0.0267012541522619 occ= 0
+MO #15  energy= 0.0376681671308486 | 0.0374824270473444 | 0.0378539072143539 occ= 0
+MO #16  energy= 0.0380509488505489 | 0.0379132573533492 | 0.0381886403477489 occ= 0
+MO #17  energy= 0.0412696074130927 | 0.0395761186240959 | 0.0429630962020903 occ= 0
+MO #18  energy= 0.0412696074130941 | 0.0395761186241006 | 0.0429630962020879 occ= 0
+MO #19  energy= 0.0433109580747095 | 0.0425799103030101 | 0.0440420058464126 occ= 0
+MO #20  energy= 0.0445682777812884 | 0.0322755969040953 | 0.0568609586584824 occ= 0
+MO #21  energy= 0.0445682777812916 | 0.0322755969040935 | 0.0568609586584889 occ= 0
+MO #22  energy= 0.0616353332988437 | 0.0488170656982696 | 0.074453600899418  occ= 0
+MO #23  energy= 0.095436109270453  | 0.0883506968378542 | 0.102521521703053  occ= 0
+MO #24  energy= 0.119676935003851  | 0.115009763467779  | 0.124344106539922  occ= 0
+MO #25  energy= 0.126359459742134  | 0.124265848009409  | 0.128453071474858  occ= 0
+MO #26  energy= 0.126359459742134  | 0.124265848009409  | 0.128453071474858  occ= 0
+MO #27  energy= 0.128184265921241  | 0.12526352768795   | 0.131105004154532  occ= 0
+MO #28  energy= 0.142819725685284  | 0.131658721535642  | 0.15398072983493   occ= 0
+MO #29  energy= 0.163339768123785  | 0.14723353679559   | 0.179445999451978  occ= 0
+MO #30  energy= 0.163339768123789  | 0.147233536795594  | 0.179445999451983  occ= 0
+MO #31  energy= 0.172577292911559  | 0.160483539353822  | 0.184671046469297  occ= 0
+MO #32  energy= 0.174326998951579  | 0.16579507909562   | 0.18285891880754   occ= 0
+MO #33  energy= 0.246419753469706  | 0.228814457881582  | 0.264025049057831  occ= 0
+MO #34  energy= 0.246419753469711  | 0.228814457881586  | 0.264025049057836  occ= 0
+MO #35  energy= 0.382841161048468  | 0.377309071864688  | 0.388373250232248  occ= 0
+MO #36  energy= 0.437672446252631  | 0.436232214235202  | 0.43911267827006   occ= 0
+MO #37  energy= 0.437672446252638  | 0.436232214235204  | 0.439112678270071  occ= 0
+MO #38  energy= 0.467039595988019  | 0.462743953493998  | 0.471335238482041  occ= 0
+MO #39  energy= 0.930157555527547  | 0.914784149404459  | 0.945530961650633  occ= 0
+MO #40  energy= 0.961301650390477  | 0.894054072223057  | 1.02854922855789   occ= 0
+MO #41  energy= 1.02913883913695   | 1.01890579178241   | 1.0393718864915    occ= 0
+MO #42  energy= 1.16729403657785   | 1.15284050451588   | 1.18174756863982   occ= 0
+MO #43  energy= 1.16729403657786   | 1.15284050451589   | 1.18174756863983   occ= 0
+MO #44  energy= 1.40287922722673   | 1.39711077569722   | 1.40864767875626   occ= 0
+MO #45  energy= 1.40527706086353   | 1.4035776295534    | 1.40697649217365   occ= 0
+MO #46  energy= 1.40952123805848   | 1.39698886348512   | 1.42205361263185   occ= 0
+MO #47  energy= 1.49494244262651   | 1.49151712199108   | 1.49836776326195   occ= 0
+MO #48  energy= 1.49494244262652   | 1.49151712199108   | 1.49836776326195   occ= 0
+MO #49  energy= 1.50096153731138   | 1.4928389518981    | 1.50908412272465   occ= 0
+MO #50  energy= 1.55675847592862   | 1.55559746779527   | 1.55791948406199   occ= 0
+MO #51  energy= 1.55675847592862   | 1.55559746779527   | 1.55791948406199   occ= 0
+MO #52  energy= 1.8032683419936    | 1.7947232743355    | 1.81181340965171   occ= 0
+MO #53  energy= 1.96126044957617   | 1.95612777643373   | 1.96639312271861   occ= 0
+MO #54  energy= 2.15894972476896   | 2.12081450319304   | 2.19708494634488   occ= 0
+MO #55  energy= 2.15894972476896   | 2.12081450319304   | 2.19708494634488   occ= 0
+MO #56  energy= 2.23704645730149   | 2.20941279969974   | 2.26468011490324   occ= 0
+MO #57  energy= 2.24475896371726   | 2.24013725229088   | 2.24938067514365   occ= 0
+MO #58  energy= 2.26027139764665   | 2.23539089348669   | 2.2851519018066    occ= 0
+MO #59  energy= 2.26027139764665   | 2.2353908934867    | 2.28515190180661   occ= 0
+MO #60  energy= 2.50389775500072   | 2.497687351475     | 2.51010815852645   occ= 0
+MO #61  energy= 2.67413740457912   | 2.66687988107451   | 2.68139492808374   occ= 0
+MO #62  energy= 2.67413740457913   | 2.66687988107452   | 2.68139492808375   occ= 0
+MO #63  energy= 3.46702899027458   | 3.45909812757982   | 3.47495985296931   occ= 0
+MO #64  energy= 4.21686518409433   | 4.21666792322503   | 4.21706244496364   occ= 0
+MO #65  energy= 4.21705087417896   | 4.21665594633723   | 4.21744580202068   occ= 0
+MO #66  energy= 4.32944725910099   | 4.32900161262092   | 4.32989290558107   occ= 0
+MO #67  energy= 4.32944725910099   | 4.32900161262092   | 4.32989290558107   occ= 0
+MO #68  energy= 4.43369209439767   | 4.43228365835089   | 4.43510053044445   occ= 0
+MO #69  energy= 5.90021925062192   | 5.8658871015339    | 5.93455139970993   occ= 0
+MO #70  energy= 5.90021925062194   | 5.86588710153394   | 5.93455139970996   occ= 0
+MO #71  energy= 5.93385596366162   | 5.90536080303693   | 5.96235112428631   occ= 0
+MO #72  energy= 5.93610902724294   | 5.93135809783515   | 5.94085995665071   occ= 0
+MO #73  energy= 6.06029272110018   | 6.05368793013911   | 6.0668975120611    occ= 0
+MO #74  energy= 6.11343635250273   | 6.10203385384186   | 6.1248388511636    occ= 0
+MO #75  energy= 6.11343635250276   | 6.10203385384188   | 6.12483885116363   occ= 0
+MO #76  energy= 6.22271537012833   | 6.21365374770804   | 6.23177699254858   occ= 0
+ ** Mulliken pop on meta-lowdin orthogonal AOs  **
+ ** Mulliken pop  **
+pop of  0 Ti 3s           1.99959
+pop of  0 Ti 4s           0.89247
+pop of  0 Ti 5s           0.00422
+pop of  0 Ti 6s           0.00346
+pop of  0 Ti 7s           0.00179
+pop of  0 Ti 3px          1.99926
+pop of  0 Ti 3py          1.99926
+pop of  0 Ti 3pz          1.99624
+pop of  0 Ti 4px          0.01101
+pop of  0 Ti 4py          0.01101
+pop of  0 Ti 4pz          0.07933
+pop of  0 Ti 5px          0.00017
+pop of  0 Ti 5py          0.00017
+pop of  0 Ti 5pz          0.00636
+pop of  0 Ti 6px          0.00033
+pop of  0 Ti 6py          0.00033
+pop of  0 Ti 6pz          0.01462
+pop of  0 Ti 7px          0.00006
+pop of  0 Ti 7py          0.00006
+pop of  0 Ti 7pz          0.00160
+pop of  0 Ti 3dxy         0.99282
+pop of  0 Ti 3dyz         0.31215
+pop of  0 Ti 3dz^2        0.52625
+pop of  0 Ti 3dxz         0.31215
+pop of  0 Ti 3dx2-y2      0.00000
+pop of  0 Ti 4dxy         0.00528
+pop of  0 Ti 4dyz         0.00061
+pop of  0 Ti 4dz^2        0.00498
+pop of  0 Ti 4dxz         0.00061
+pop of  0 Ti 4dx2-y2      0.00000
+pop of  0 Ti 5dxy         0.00178
+pop of  0 Ti 5dyz         0.00003
+pop of  0 Ti 5dz^2        0.00192
+pop of  0 Ti 5dxz         0.00003
+pop of  0 Ti 5dx2-y2      0.00000
+pop of  0 Ti 6dxy         0.00001
+pop of  0 Ti 6dyz         0.00000
+pop of  0 Ti 6dz^2        0.00004
+pop of  0 Ti 6dxz         0.00000
+pop of  0 Ti 6dx2-y2      0.00000
+pop of  0 Ti 4f-3         0.00004
+pop of  0 Ti 4f-2         0.00000
+pop of  0 Ti 4f-1         0.00018
+pop of  0 Ti 4f+0         0.00035
+pop of  0 Ti 4f+1         0.00018
+pop of  0 Ti 4f+2         0.00000
+pop of  0 Ti 4f+3         0.00004
+pop of  0 Ti 5f-3         0.00006
+pop of  0 Ti 5f-2         0.00005
+pop of  0 Ti 5f-1         0.00106
+pop of  0 Ti 5f+0         0.00144
+pop of  0 Ti 5f+1         0.00106
+pop of  0 Ti 5f+2         0.00000
+pop of  0 Ti 5f+3         0.00006
+pop of  1 O 2s            1.85620
+pop of  1 O 3s            0.00606
+pop of  1 O 4s            0.01879
+pop of  1 O 2px           1.66462
+pop of  1 O 2py           1.66462
+pop of  1 O 2pz           1.57675
+pop of  1 O 3px           0.00284
+pop of  1 O 3py           0.00284
+pop of  1 O 3pz           0.00133
+pop of  1 O 4px           0.00243
+pop of  1 O 4py           0.00243
+pop of  1 O 4pz           0.00165
+pop of  1 O 3dxy          0.00001
+pop of  1 O 3dyz          0.00110
+pop of  1 O 3dz^2         0.00149
+pop of  1 O 3dxz          0.00110
+pop of  1 O 3dx2-y2       0.00000
+pop of  1 O 4dxy          0.00005
+pop of  1 O 4dyz          0.00406
+pop of  1 O 4dz^2         0.00308
+pop of  1 O 4dxz          0.00406
+pop of  1 O 4dx2-y2       0.00000
+ ** Mulliken atomic charges  **
+charge of    0Ti =      0.81552
+charge of    1O =     -0.81552
+Dipole moment(X, Y, Z, Debye): -0.00000, -0.00000, -4.36481
+Total RHF energy =  -7.326973605789953581e+01
+
+
+Eigenvalue of overlap matrix: 
+0           1.860081076478571930e-03
+1           1.174462232321877783e-02
+2           1.526806443688445702e-02
+3           5.347090398069047346e-02
+4           6.061390259439733419e-02
+5           6.061390259439829176e-02
+6           7.135585676276122447e-02
+7           7.135585676276141875e-02
+8           8.818609550629395721e-02
+9           1.224579669440704899e-01
+10          1.351617422509767685e-01
+11          1.351617422509771294e-01
+12          1.622975023487615298e-01
+13          1.868772319647366287e-01
+14          1.868772319647371283e-01
+15          1.958590899378199190e-01
+16          1.958590899378218064e-01
+17          2.052793855103113851e-01
+18          2.545384146232099742e-01
+19          2.545384146232101408e-01
+20          2.664633559820986375e-01
+21          2.702914605881215904e-01
+22          2.702914605881216459e-01
+23          2.859592253905828829e-01
+24          2.859592253905831605e-01
+25          3.143073926261836237e-01
+26          3.143073926261837903e-01
+27          3.200515912822037845e-01
+28          3.245623818717529030e-01
+29          3.245623818717529585e-01
+30          3.827006062761507676e-01
+31          5.192660288678568881e-01
+32          5.192660288678569991e-01
+33          5.952402380319793407e-01
+34          6.069804975257312440e-01
+35          6.383117502178474734e-01
+36          6.383117502178479175e-01
+37          8.308421011914252086e-01
+38          8.308421011914259857e-01
+39          8.675178780713059812e-01
+40          8.675178780713072024e-01
+41          8.939112371688247016e-01
+42          9.684279073748228717e-01
+43          9.684279073748236488e-01
+44          9.866109706485125530e-01
+45          9.935154377771838741e-01
+46          9.935154377771849843e-01
+47          9.988613355089028811e-01
+48          1.003404867117620336e+00
+49          1.003404867117621002e+00
+50          1.058476501499894251e+00
+51          1.348373753416191478e+00
+52          1.508742170380511949e+00
+53          1.508742170380513503e+00
+54          1.537550940033060920e+00
+55          1.537550940033062474e+00
+56          1.602734103845752767e+00
+57          1.612074055639629355e+00
+58          1.612074055639629799e+00
+59          1.714040774609417062e+00
+60          1.714040774609417728e+00
+61          1.786174078925790054e+00
+62          1.786174078925790498e+00
+63          1.867567149708124097e+00
+64          1.976013652398872500e+00
+65          1.976013652398873610e+00
+66          2.008862295290407385e+00
+67          2.008862295290408717e+00
+68          2.190686674191598904e+00
+69          2.296499879361556751e+00
+70          2.296499879361556751e+00
+71          2.453545250946290501e+00
+72          3.346005714159314248e+00
+73          3.639229484132144421e+00
+74          3.639229484132145309e+00
+75          4.421226397681716769e+00
+Number of dependent obritals is 0.
+
+
+Inside modified Cholesky 0           8.848954384281303431e-01.
+Inside modified Cholesky 1           7.295191281698950592e-01.
+Inside modified Cholesky 2           2.570500380580590938e-01.
+Inside modified Cholesky 3           1.997577309973436743e-01.
+Inside modified Cholesky 4           1.997577309973436743e-01.
+Inside modified Cholesky 5           1.953032954252875431e-01.
+Inside modified Cholesky 6           1.857285769041442380e-01.
+Inside modified Cholesky 7           1.610581741254793753e-01.
+Inside modified Cholesky 8           1.610581741254793753e-01.
+Inside modified Cholesky 9           1.485428789061391253e-01.
+Inside modified Cholesky 10          1.309101094559214362e-01.
+Inside modified Cholesky 11          1.069393203026119815e-01.
+Inside modified Cholesky 12          9.058341804711168843e-02.
+Inside modified Cholesky 13          8.881396323518583880e-02.
+Inside modified Cholesky 14          8.240840480082928243e-02.
+Inside modified Cholesky 15          8.240840480082928243e-02.
+Inside modified Cholesky 16          8.009944550751761649e-02.
+Inside modified Cholesky 17          7.945563924246350218e-02.
+Inside modified Cholesky 18          7.945563924246350218e-02.
+Inside modified Cholesky 19          7.823850942744911552e-02.
+Inside modified Cholesky 20          7.801486683423614066e-02.
+Inside modified Cholesky 21          7.057026932213059101e-02.
+Inside modified Cholesky 22          6.738199641266184869e-02.
+Inside modified Cholesky 23          6.603389787505588304e-02.
+Inside modified Cholesky 24          6.315851085425999711e-02.
+Inside modified Cholesky 25          6.054036169881201607e-02.
+Inside modified Cholesky 26          5.231337833540986720e-02.
+Inside modified Cholesky 27          5.231337833540986720e-02.
+Inside modified Cholesky 28          5.230254868000365487e-02.
+Inside modified Cholesky 29          5.214760285963422615e-02.
+Inside modified Cholesky 30          5.214760285963422615e-02.
+Inside modified Cholesky 31          5.214363375092471303e-02.
+Inside modified Cholesky 32          5.192648884560974176e-02.
+Inside modified Cholesky 33          4.936861425070122877e-02.
+Inside modified Cholesky 34          4.872961137741341903e-02.
+Inside modified Cholesky 35          4.858439782194134970e-02.
+Inside modified Cholesky 36          4.714201697093766547e-02.
+Inside modified Cholesky 37          4.598198219589785807e-02.
+Inside modified Cholesky 38          4.598198219589785807e-02.
+Inside modified Cholesky 39          4.427529858364294413e-02.
+Inside modified Cholesky 40          4.427529858364294413e-02.
+Inside modified Cholesky 41          4.417799131641217403e-02.
+Inside modified Cholesky 42          3.948200026246525413e-02.
+Inside modified Cholesky 43          3.946922699345714602e-02.
+Inside modified Cholesky 44          3.905239713924443801e-02.
+Inside modified Cholesky 45          3.732722579267248181e-02.
+Inside modified Cholesky 46          3.732722579267247487e-02.
+Inside modified Cholesky 47          3.704360839641805681e-02.
+Inside modified Cholesky 48          3.704360839641804987e-02.
+Inside modified Cholesky 49          3.663421733088363663e-02.
+Inside modified Cholesky 50          3.658122414745745149e-02.
+Inside modified Cholesky 51          3.658122414745744455e-02.
+Inside modified Cholesky 52          3.473884428480215891e-02.
+Inside modified Cholesky 53          3.183909431606550544e-02.
+Inside modified Cholesky 54          3.071239197266658824e-02.
+Inside modified Cholesky 55          3.013892386435495369e-02.
+Inside modified Cholesky 56          2.976557993787756762e-02.
+Inside modified Cholesky 57          2.788608212197790648e-02.
+Inside modified Cholesky 58          2.788608212197790648e-02.
+Inside modified Cholesky 59          2.773001936735320500e-02.
+Inside modified Cholesky 60          2.627493335702929186e-02.
+Inside modified Cholesky 61          2.612821152799322394e-02.
+Inside modified Cholesky 62          2.599841271551216540e-02.
+Inside modified Cholesky 63          2.573655496050120811e-02.
+Inside modified Cholesky 64          2.524034907921818630e-02.
+Inside modified Cholesky 65          2.502464626426967667e-02.
+Inside modified Cholesky 66          2.371007961659039182e-02.
+Inside modified Cholesky 67          2.371007961659039182e-02.
+Inside modified Cholesky 68          2.349091656630413610e-02.
+Inside modified Cholesky 69          2.228795702684516558e-02.
+Inside modified Cholesky 70          2.228795702684514130e-02.
+Inside modified Cholesky 71          2.227369897275058644e-02.
+Inside modified Cholesky 72          2.227369897275057603e-02.
+Inside modified Cholesky 73          2.088388565629761481e-02.
+Inside modified Cholesky 74          2.025413921894787111e-02.
+Inside modified Cholesky 75          2.006102417632787266e-02.
+Inside modified Cholesky 76          1.999710043495446857e-02.
+Inside modified Cholesky 77          1.889846099022791243e-02.
+Inside modified Cholesky 78          1.853782295812373554e-02.
+Inside modified Cholesky 79          1.831960273817039714e-02.
+Inside modified Cholesky 80          1.803058172711772406e-02.
+Inside modified Cholesky 81          1.803058172711772406e-02.
+Inside modified Cholesky 82          1.792305765610710186e-02.
+Inside modified Cholesky 83          1.748394387939635614e-02.
+Inside modified Cholesky 84          1.734355093673857484e-02.
+Inside modified Cholesky 85          1.701328760741322929e-02.
+Inside modified Cholesky 86          1.701328760741322235e-02.
+Inside modified Cholesky 87          1.651998079823210896e-02.
+Inside modified Cholesky 88          1.625315652745979583e-02.
+Inside modified Cholesky 89          1.595841236782752012e-02.
+Inside modified Cholesky 90          1.574284137145792392e-02.
+Inside modified Cholesky 91          1.574284137145791004e-02.
+Inside modified Cholesky 92          1.536992620188360609e-02.
+Inside modified Cholesky 93          1.516733210783461488e-02.
+Inside modified Cholesky 94          1.477758922099384892e-02.
+Inside modified Cholesky 95          1.471591195770798402e-02.
+Inside modified Cholesky 96          1.471591195770798055e-02.
+Inside modified Cholesky 97          1.469657750159414876e-02.
+Inside modified Cholesky 98          1.469657750159414876e-02.
+Inside modified Cholesky 99          1.422354915455419783e-02.
+Inside modified Cholesky 100         1.421115199482048119e-02.
+Inside modified Cholesky 101         1.363592806852077961e-02.
+Inside modified Cholesky 102         1.357845701491936820e-02.
+Inside modified Cholesky 103         1.357845701491936126e-02.
+Inside modified Cholesky 104         1.351866750133854864e-02.
+Inside modified Cholesky 105         1.345579447322613025e-02.
+Inside modified Cholesky 106         1.343408453535216950e-02.
+Inside modified Cholesky 107         1.343408453535216950e-02.
+Inside modified Cholesky 108         1.335252295406016802e-02.
+Inside modified Cholesky 109         1.335252295406016282e-02.
+Inside modified Cholesky 110         1.319446812138833428e-02.
+Inside modified Cholesky 111         1.319446812138832387e-02.
+Inside modified Cholesky 112         1.262302711453768857e-02.
+Inside modified Cholesky 113         1.262302711453768510e-02.
+Inside modified Cholesky 114         1.247597044454035187e-02.
+Inside modified Cholesky 115         1.227492640123270182e-02.
+Inside modified Cholesky 116         1.225425330475875263e-02.
+Inside modified Cholesky 117         1.198471925721915354e-02.
+Inside modified Cholesky 118         1.195581513452366983e-02.
+Inside modified Cholesky 119         1.187276854550806462e-02.
+Inside modified Cholesky 120         1.138607874764241933e-02.
+Inside modified Cholesky 121         1.121068995771368551e-02.
+Inside modified Cholesky 122         1.119665478080256703e-02.
+Inside modified Cholesky 123         1.100047173388410578e-02.
+Inside modified Cholesky 124         1.090054930801306887e-02.
+Inside modified Cholesky 125         1.086877123270359700e-02.
+Inside modified Cholesky 126         1.078671451898112130e-02.
+Inside modified Cholesky 127         1.078671451898111783e-02.
+Inside modified Cholesky 128         1.058735606247430440e-02.
+Inside modified Cholesky 129         1.058735606247430440e-02.
+Inside modified Cholesky 130         1.033024462378148711e-02.
+Inside modified Cholesky 131         1.033024462378148711e-02.
+Inside modified Cholesky 132         1.030466350918461151e-02.
+Inside modified Cholesky 133         1.030466350918460283e-02.
+Inside modified Cholesky 134         1.020649008375915795e-02.
+Inside modified Cholesky 135         1.020649008375915795e-02.
+Inside modified Cholesky 136         1.017976282673902638e-02.
+Inside modified Cholesky 137         1.017976282673902465e-02.
+Inside modified Cholesky 138         1.002474995422868165e-02.
+Inside modified Cholesky 139         9.934050960668083102e-03.
+Inside modified Cholesky 140         9.810540917794964566e-03.
+Inside modified Cholesky 141         9.017784730631127690e-03.
+Inside modified Cholesky 142         8.800883079621421232e-03.
+Inside modified Cholesky 143         8.574038231026854737e-03.
+Inside modified Cholesky 144         8.542377249318892224e-03.
+Inside modified Cholesky 145         8.533376488298683241e-03.
+Inside modified Cholesky 146         8.379752442143274110e-03.
+Inside modified Cholesky 147         8.379752442143270641e-03.
+Inside modified Cholesky 148         8.225684653711488187e-03.
+Inside modified Cholesky 149         8.111914712892544926e-03.
+Inside modified Cholesky 150         7.864996569234034007e-03.
+Inside modified Cholesky 151         7.864996569234034007e-03.
+Inside modified Cholesky 152         7.291824989803125448e-03.
+Inside modified Cholesky 153         7.247334261330796654e-03.
+Inside modified Cholesky 154         7.228485939504215516e-03.
+Inside modified Cholesky 155         7.228485939504209444e-03.
+Inside modified Cholesky 156         7.179460514665761753e-03.
+Inside modified Cholesky 157         7.179460514665760885e-03.
+Inside modified Cholesky 158         6.954942828353270941e-03.
+Inside modified Cholesky 159         6.941136072111253261e-03.
+Inside modified Cholesky 160         6.644834986615244868e-03.
+Inside modified Cholesky 161         6.644834986615224919e-03.
+Inside modified Cholesky 162         6.532561109687436314e-03.
+Inside modified Cholesky 163         6.494561482485287224e-03.
+Inside modified Cholesky 164         6.357248437173861587e-03.
+Inside modified Cholesky 165         6.357248437173835566e-03.
+Inside modified Cholesky 166         6.201410752560357863e-03.
+Inside modified Cholesky 167         6.201410752560356128e-03.
+Inside modified Cholesky 168         6.063149160993882604e-03.
+Inside modified Cholesky 169         5.890904145272599264e-03.
+Inside modified Cholesky 170         5.726845073398372822e-03.
+Inside modified Cholesky 171         5.723063858138536381e-03.
+Inside modified Cholesky 172         5.723063858138522503e-03.
+Inside modified Cholesky 173         5.608640068250467584e-03.
+Inside modified Cholesky 174         5.593503054015982329e-03.
+Inside modified Cholesky 175         5.184000088665426803e-03.
+Inside modified Cholesky 176         5.184000088665424201e-03.
+Inside modified Cholesky 177         5.167504050266046381e-03.
+Inside modified Cholesky 178         5.019282438629474666e-03.
+Inside modified Cholesky 179         5.019282438629472931e-03.
+Inside modified Cholesky 180         4.852955201577244422e-03.
+Inside modified Cholesky 181         4.659378396271889045e-03.
+Inside modified Cholesky 182         4.628096277737843087e-03.
+Inside modified Cholesky 183         4.616800302970019629e-03.
+Inside modified Cholesky 184         4.616800302970018761e-03.
+Inside modified Cholesky 185         4.555886168216538232e-03.
+Inside modified Cholesky 186         4.548790282751467677e-03.
+Inside modified Cholesky 187         4.548790282751458136e-03.
+Inside modified Cholesky 188         4.540665059053381261e-03.
+Inside modified Cholesky 189         4.540665059053376057e-03.
+Inside modified Cholesky 190         4.517098891697158593e-03.
+Inside modified Cholesky 191         4.246725741004676695e-03.
+Inside modified Cholesky 192         4.246725741004674960e-03.
+Inside modified Cholesky 193         4.228121651170238873e-03.
+Inside modified Cholesky 194         3.737647724429690906e-03.
+Inside modified Cholesky 195         3.730983220881815658e-03.
+Inside modified Cholesky 196         3.523666323859806979e-03.
+Inside modified Cholesky 197         3.523666323859806545e-03.
+Inside modified Cholesky 198         3.354197185974323783e-03.
+Inside modified Cholesky 199         3.253092557011422626e-03.
+Inside modified Cholesky 200         3.226153535076095244e-03.
+Inside modified Cholesky 201         3.219327283873809568e-03.
+Inside modified Cholesky 202         3.219327283873805665e-03.
+Inside modified Cholesky 203         3.210670434035061468e-03.
+Inside modified Cholesky 204         3.210670434035060600e-03.
+Inside modified Cholesky 205         3.065807315335622885e-03.
+Inside modified Cholesky 206         3.065807315335618548e-03.
+Inside modified Cholesky 207         3.005652384941594809e-03.
+Inside modified Cholesky 208         2.956961358924674408e-03.
+Inside modified Cholesky 209         2.874613441359692538e-03.
+Inside modified Cholesky 210         2.874613441359665650e-03.
+Inside modified Cholesky 211         2.768554546748613725e-03.
+Inside modified Cholesky 212         2.674020426280379094e-03.
+Inside modified Cholesky 213         2.657499980211785670e-03.
+Inside modified Cholesky 214         2.657499980211780466e-03.
+Inside modified Cholesky 215         2.560575927572655668e-03.
+Inside modified Cholesky 216         2.560575927572652632e-03.
+Inside modified Cholesky 217         2.551283625003181697e-03.
+Inside modified Cholesky 218         2.528718638911521457e-03.
+Inside modified Cholesky 219         2.500618945723001238e-03.
+Inside modified Cholesky 220         2.499577286759833983e-03.
+Inside modified Cholesky 221         2.462952759952795594e-03.
+Inside modified Cholesky 222         2.455836615756478228e-03.
+Inside modified Cholesky 223         2.355311125324021683e-03.
+Inside modified Cholesky 224         2.325754919821951001e-03.
+Inside modified Cholesky 225         2.294714836411729155e-03.
+Inside modified Cholesky 226         2.218813002714059048e-03.
+Inside modified Cholesky 227         2.218813002714058614e-03.
+Inside modified Cholesky 228         2.201359185717152549e-03.
+Inside modified Cholesky 229         2.201359185717151681e-03.
+Inside modified Cholesky 230         2.158071047531884799e-03.
+Inside modified Cholesky 231         2.134751242324268994e-03.
+Inside modified Cholesky 232         2.134751242324267693e-03.
+Inside modified Cholesky 233         2.103610902681437526e-03.
+Inside modified Cholesky 234         2.103610902681431888e-03.
+Inside modified Cholesky 235         2.027300103603516934e-03.
+Inside modified Cholesky 236         2.027300103603496984e-03.
+Inside modified Cholesky 237         1.973583532674967611e-03.
+Inside modified Cholesky 238         1.822979956069068494e-03.
+Inside modified Cholesky 239         1.798383644142029615e-03.
+Inside modified Cholesky 240         1.785039086483707549e-03.
+Inside modified Cholesky 241         1.714310483964841649e-03.
+Inside modified Cholesky 242         1.681046716363124478e-03.
+Inside modified Cholesky 243         1.681046716363121659e-03.
+Inside modified Cholesky 244         1.648934443401414230e-03.
+Inside modified Cholesky 245         1.529870528866595280e-03.
+Inside modified Cholesky 246         1.494580794173281735e-03.
+Inside modified Cholesky 247         1.494580794173281085e-03.
+Inside modified Cholesky 248         1.454273363223259913e-03.
+Inside modified Cholesky 249         1.318812483871022179e-03.
+Inside modified Cholesky 250         1.301453393311753116e-03.
+Inside modified Cholesky 251         1.301453393311747912e-03.
+Inside modified Cholesky 252         1.275811382144572455e-03.
+Inside modified Cholesky 253         1.218847478860916314e-03.
+Inside modified Cholesky 254         1.218847478860914362e-03.
+Inside modified Cholesky 255         1.199943085096921887e-03.
+Inside modified Cholesky 256         1.176961974006792777e-03.
+Inside modified Cholesky 257         1.165503478882622384e-03.
+Inside modified Cholesky 258         1.110079710930279634e-03.
+Inside modified Cholesky 259         9.471759078335465886e-04.
+Inside modified Cholesky 260         9.290990347506146744e-04.
+Inside modified Cholesky 261         9.290990347505970019e-04.
+Inside modified Cholesky 262         9.197041269324362708e-04.
+Inside modified Cholesky 263         9.197041269324260793e-04.
+Inside modified Cholesky 264         8.791761609505121004e-04.
+Inside modified Cholesky 265         8.791761609504993068e-04.
+Inside modified Cholesky 266         8.775643673412643429e-04.
+Inside modified Cholesky 267         8.775643673412634755e-04.
+Inside modified Cholesky 268         8.748589135141775566e-04.
+Inside modified Cholesky 269         8.499533154535116996e-04.
+Inside modified Cholesky 270         8.412721488194428851e-04.
+Inside modified Cholesky 271         8.301453473399905518e-04.
+Inside modified Cholesky 272         8.276445045067946232e-04.
+Inside modified Cholesky 273         7.612188802443666837e-04.
+Inside modified Cholesky 274         7.544482219063917104e-04.
+Inside modified Cholesky 275         7.478000363889925842e-04.
+Inside modified Cholesky 276         7.478000363889730686e-04.
+Inside modified Cholesky 277         7.363564623598130559e-04.
+Inside modified Cholesky 278         7.284629748668066708e-04.
+Inside modified Cholesky 279         7.284629748667949614e-04.
+Inside modified Cholesky 280         6.150089861585490312e-04.
+Inside modified Cholesky 281         5.669968179408261307e-04.
+Inside modified Cholesky 282         5.633778436114638853e-04.
+Inside modified Cholesky 283         5.506216782154331945e-04.
+Inside modified Cholesky 284         5.506216782154290746e-04.
+Inside modified Cholesky 285         5.426222067247427755e-04.
+Inside modified Cholesky 286         5.329640032000740237e-04.
+Inside modified Cholesky 287         4.784401749163460626e-04.
+Inside modified Cholesky 288         4.784401749163437315e-04.
+Inside modified Cholesky 289         4.624355996391234843e-04.
+Inside modified Cholesky 290         4.587639193478907284e-04.
+Inside modified Cholesky 291         4.547542380180005219e-04.
+Inside modified Cholesky 292         4.405225264764163311e-04.
+Inside modified Cholesky 293         4.405225264764105306e-04.
+Inside modified Cholesky 294         4.292325583281767008e-04.
+Inside modified Cholesky 295         4.130780675532064010e-04.
+Inside modified Cholesky 296         4.130780675531907885e-04.
+Inside modified Cholesky 297         3.918344420341474880e-04.
+Inside modified Cholesky 298         3.918344420341464038e-04.
+Inside modified Cholesky 299         3.758543414563826558e-04.
+Inside modified Cholesky 300         3.659406394013290124e-04.
+Inside modified Cholesky 301         3.659406394013140504e-04.
+Inside modified Cholesky 302         3.619662566473821896e-04.
+Inside modified Cholesky 303         3.617793514108196668e-04.
+Inside modified Cholesky 304         3.603493475362953033e-04.
+Inside modified Cholesky 305         3.555926032484854594e-04.
+Inside modified Cholesky 306         3.538300331877266202e-04.
+Inside modified Cholesky 307         3.538300331877238555e-04.
+Inside modified Cholesky 308         3.463655347445949669e-04.
+Inside modified Cholesky 309         3.457443197047528941e-04.
+Inside modified Cholesky 310         3.447620339605270753e-04.
+Inside modified Cholesky 311         3.429678645179937710e-04.
+Inside modified Cholesky 312         3.380124159160304053e-04.
+Inside modified Cholesky 313         3.380124159160241711e-04.
+Inside modified Cholesky 314         3.129394561312055399e-04.
+Inside modified Cholesky 315         3.044967959883242105e-04.
+Inside modified Cholesky 316         2.953473014761951940e-04.
+Inside modified Cholesky 317         2.830210946138855734e-04.
+Inside modified Cholesky 318         2.712464843967232514e-04.
+Inside modified Cholesky 319         2.681214167152929859e-04.
+Inside modified Cholesky 320         2.589531289424587871e-04.
+Inside modified Cholesky 321         2.500170171839496318e-04.
+Inside modified Cholesky 322         2.493261557146173252e-04.
+Inside modified Cholesky 323         2.493261557146024174e-04.
+Inside modified Cholesky 324         2.435388876360071616e-04.
+Inside modified Cholesky 325         2.394630390111341202e-04.
+Inside modified Cholesky 326         2.335103861338161976e-04.
+Inside modified Cholesky 327         2.335103861338132161e-04.
+Inside modified Cholesky 328         2.317341056243230231e-04.
+Inside modified Cholesky 329         2.286978313814561200e-04.
+Inside modified Cholesky 330         2.286978313814444377e-04.
+Inside modified Cholesky 331         2.144646383866519298e-04.
+Inside modified Cholesky 332         2.097582880253490070e-04.
+Inside modified Cholesky 333         2.067499721985387911e-04.
+Inside modified Cholesky 334         2.067499721985356469e-04.
+Inside modified Cholesky 335         2.050830002249830111e-04.
+Inside modified Cholesky 336         2.050830002249640375e-04.
+Inside modified Cholesky 337         1.968528926788864228e-04.
+Inside modified Cholesky 338         1.833428950212210033e-04.
+Inside modified Cholesky 339         1.819404138989558629e-04.
+Inside modified Cholesky 340         1.819404138989532066e-04.
+Inside modified Cholesky 341         1.642205118113840420e-04.
+Inside modified Cholesky 342         1.593600454049549074e-04.
+Inside modified Cholesky 343         1.557876943549497354e-04.
+Inside modified Cholesky 344         1.528266805792585347e-04.
+Inside modified Cholesky 345         1.499964384686411746e-04.
+Inside modified Cholesky 346         1.499964384686309560e-04.
+Inside modified Cholesky 347         1.489390829582178284e-04.
+Inside modified Cholesky 348         1.489390829582138440e-04.
+Inside modified Cholesky 349         1.435958686432759303e-04.
+Inside modified Cholesky 350         1.433422574655614278e-04.
+Inside modified Cholesky 351         1.357133764501626343e-04.
+Inside modified Cholesky 352         1.341312377719652371e-04.
+Inside modified Cholesky 353         1.278768770329957272e-04.
+Inside modified Cholesky 354         1.278768770329897098e-04.
+Inside modified Cholesky 355         1.255831329185009063e-04.
+Inside modified Cholesky 356         1.255831329184983313e-04.
+Inside modified Cholesky 357         1.235376197317286152e-04.
+Inside modified Cholesky 358         1.199679468354757853e-04.
+Inside modified Cholesky 359         1.199679468354618533e-04.
+Inside modified Cholesky 360         1.152668646962908108e-04.
+Inside modified Cholesky 361         1.152668646962765807e-04.
+Inside modified Cholesky 362         1.106810611654987926e-04.
+Inside modified Cholesky 363         1.053882052490848193e-04.
+Inside modified Cholesky 364         1.053882052490831794e-04.
+Inside modified Cholesky 365         9.776181796606594815e-05.
+Inside modified Cholesky 366         9.572314294293620622e-05.
+Inside modified Cholesky 367         9.572314294292803404e-05.
+Inside modified Cholesky 368         9.316051119638454848e-05.
+Inside modified Cholesky 369         8.851499257024204848e-05.
+Inside modified Cholesky 370         8.546027156995395510e-05.
+Inside modified Cholesky 371         8.546027156994773449e-05.
+Inside modified Cholesky 372         8.531499481265457938e-05.
+Inside modified Cholesky 373         7.958653796306357491e-05.
+Inside modified Cholesky 374         7.564301125394042751e-05.
+Inside modified Cholesky 375         7.524425282543676069e-05.
+Inside modified Cholesky 376         7.148219062177432401e-05.
+Inside modified Cholesky 377         6.902856688844240132e-05.
+Inside modified Cholesky 378         6.902856688843748176e-05.
+Inside modified Cholesky 379         6.694266989446830390e-05.
+Inside modified Cholesky 380         6.382984803417635772e-05.
+Inside modified Cholesky 381         6.215638595741169341e-05.
+Inside modified Cholesky 382         5.852904068388894429e-05.
+Inside modified Cholesky 383         5.690949380274918593e-05.
+Inside modified Cholesky 384         5.589652328904051205e-05.
+Inside modified Cholesky 385         5.586271131063593647e-05.
+Inside modified Cholesky 386         5.237291899501466216e-05.
+Inside modified Cholesky 387         5.158375741952753938e-05.
+Inside modified Cholesky 388         5.158375741951622980e-05.
+Inside modified Cholesky 389         5.103949919037342850e-05.
+Inside modified Cholesky 390         5.097011518074866839e-05.
+Inside modified Cholesky 391         5.097011518073945945e-05.
+Inside modified Cholesky 392         4.580516289937123760e-05.
+Inside modified Cholesky 393         4.543160124014021355e-05.
+Inside modified Cholesky 394         4.333260502125600667e-05.
+Inside modified Cholesky 395         4.190714256404818309e-05.
+Inside modified Cholesky 396         4.081527941750756557e-05.
+Inside modified Cholesky 397         4.076655007721290803e-05.
+Inside modified Cholesky 398         4.076655007717654660e-05.
+Inside modified Cholesky 399         4.054128803420191455e-05.
+Inside modified Cholesky 400         4.054128803420093877e-05.
+Inside modified Cholesky 401         3.968296765911872426e-05.
+Inside modified Cholesky 402         3.968296765911613573e-05.
+Inside modified Cholesky 403         3.888679285645130977e-05.
+Inside modified Cholesky 404         3.686384257293817370e-05.
+Inside modified Cholesky 405         3.660030956148780068e-05.
+Inside modified Cholesky 406         3.591093663988503674e-05.
+Inside modified Cholesky 407         3.529890691416692690e-05.
+Inside modified Cholesky 408         3.506143758641401873e-05.
+Inside modified Cholesky 409         3.506143758641189098e-05.
+Inside modified Cholesky 410         3.479174807693571013e-05.
+Inside modified Cholesky 411         3.429021803997997714e-05.
+Inside modified Cholesky 412         3.411313121389171140e-05.
+Inside modified Cholesky 413         3.411313121386213301e-05.
+Inside modified Cholesky 414         3.400939690176207946e-05.
+Inside modified Cholesky 415         3.400939690176152380e-05.
+Inside modified Cholesky 416         3.307256544484631842e-05.
+Inside modified Cholesky 417         3.292291327410137121e-05.
+Inside modified Cholesky 418         3.211856984963532008e-05.
+Inside modified Cholesky 419         2.938924419737332035e-05.
+Inside modified Cholesky 420         2.938924419732988450e-05.
+Inside modified Cholesky 421         2.921563271799524958e-05.
+Inside modified Cholesky 422         2.696595240540512810e-05.
+Inside modified Cholesky 423         2.696595240540134017e-05.
+Inside modified Cholesky 424         2.571592566641924517e-05.
+Inside modified Cholesky 425         2.551920774331829995e-05.
+Inside modified Cholesky 426         2.427421951565181238e-05.
+Inside modified Cholesky 427         2.427421951564927128e-05.
+Inside modified Cholesky 428         2.392110162256889076e-05.
+Inside modified Cholesky 429         2.214546402753039174e-05.
+Inside modified Cholesky 430         2.214386931790648984e-05.
+Inside modified Cholesky 431         2.148291209122310731e-05.
+Inside modified Cholesky 432         2.141428016058943173e-05.
+Inside modified Cholesky 433         2.088264163830921724e-05.
+Inside modified Cholesky 434         2.049091988727570204e-05.
+Inside modified Cholesky 435         2.048808246626992495e-05.
+Inside modified Cholesky 436         1.882576377614489613e-05.
+Inside modified Cholesky 437         1.864705429500956179e-05.
+Inside modified Cholesky 438         1.864647125853486809e-05.
+Inside modified Cholesky 439         1.863387562654971835e-05.
+Inside modified Cholesky 440         1.832774885790112402e-05.
+Inside modified Cholesky 441         1.806367317289313360e-05.
+Inside modified Cholesky 442         1.786144421559890627e-05.
+Inside modified Cholesky 443         1.695255913086089029e-05.
+Inside modified Cholesky 444         1.695253522929214050e-05.
+Inside modified Cholesky 445         1.692935534188427758e-05.
+Inside modified Cholesky 446         1.655530875177172473e-05.
+Inside modified Cholesky 447         1.622483022589674777e-05.
+Inside modified Cholesky 448         1.622479795487765918e-05.
+Inside modified Cholesky 449         1.587066596495240991e-05.
+Inside modified Cholesky 450         1.537632547149866971e-05.
+Inside modified Cholesky 451         1.521763595342054516e-05.
+Inside modified Cholesky 452         1.489222471219103322e-05.
+Inside modified Cholesky 453         1.489220554497451660e-05.
+Inside modified Cholesky 454         1.448661639205084113e-05.
+Inside modified Cholesky 455         1.448660770286796368e-05.
+Inside modified Cholesky 456         1.438408538323856691e-05.
+Inside modified Cholesky 457         1.432450808882030518e-05.
+Inside modified Cholesky 458         1.432404065377362692e-05.
+Inside modified Cholesky 459         1.377665340693557618e-05.
+Inside modified Cholesky 460         1.377664288839158004e-05.
+Inside modified Cholesky 461         1.246877942859342056e-05.
+Inside modified Cholesky 462         1.210801990444825083e-05.
+Inside modified Cholesky 463         1.190175064501679383e-05.
+Inside modified Cholesky 464         1.190120813368653316e-05.
+Inside modified Cholesky 465         1.177665462528764253e-05.
+Inside modified Cholesky 466         1.177660623010888352e-05.
+Inside modified Cholesky 467         1.134368004619907747e-05.
+Inside modified Cholesky 468         1.112621916449690250e-05.
+Inside modified Cholesky 469         1.082487547762523164e-05.
+Inside modified Cholesky 470         1.082466607670608927e-05.
+Inside modified Cholesky 471         1.080024240289445898e-05.
+Inside modified Cholesky 472         1.080017356767739161e-05.
+Inside modified Cholesky 473         1.047804002551727383e-05.
+Inside modified Cholesky 474         1.011432939234625752e-05.
+Inside modified Cholesky 475         9.751747034092661482e-06.
+Inside modified Cholesky 476         9.734449500488541411e-06.
+Inside modified Cholesky 477         9.734374007441448767e-06.
+Inside modified Cholesky 478         9.637817683057584852e-06.
+Inside modified Cholesky 479         9.087145241082476334e-06.
+Inside modified Cholesky 480         8.767989873231018662e-06.
+Inside modified Cholesky 481         8.748844684344044329e-06.
+Inside modified Cholesky 482         8.674375227637395191e-06.
+Inside modified Cholesky 483         8.622902296342940690e-06.
+Inside modified Cholesky 484         8.622893979623267520e-06.
+Inside modified Cholesky 485         8.281097445697218389e-06.
+Inside modified Cholesky 486         8.281035041207127878e-06.
+Inside modified Cholesky 487         8.031743613426500813e-06.
+Inside modified Cholesky 488         8.030539189268231815e-06.
+Inside modified Cholesky 489         7.391290892547989936e-06.
+Inside modified Cholesky 490         7.226558495526887825e-06.
+Inside modified Cholesky 491         7.226555765358520171e-06.
+Inside modified Cholesky 492         7.215634158574051621e-06.
+Inside modified Cholesky 493         6.557333765421150996e-06.
+Inside modified Cholesky 494         6.341421270333301791e-06.
+Inside modified Cholesky 495         6.007823609508067179e-06.
+Inside modified Cholesky 496         6.007791010815242633e-06.
+Inside modified Cholesky 497         5.950421832766404116e-06.
+Inside modified Cholesky 498         5.945860920295725263e-06.
+Inside modified Cholesky 499         5.826537709387824545e-06.
+Inside modified Cholesky 500         5.578895125147647225e-06.
+Inside modified Cholesky 501         5.412612833267921529e-06.
+Inside modified Cholesky 502         5.405802610419305791e-06.
+Inside modified Cholesky 503         5.296719826877962530e-06.
+Inside modified Cholesky 504         5.296693534917502792e-06.
+Inside modified Cholesky 505         5.223795251956908045e-06.
+Inside modified Cholesky 506         5.223692021883799495e-06.
+Inside modified Cholesky 507         4.869118431307086865e-06.
+Inside modified Cholesky 508         4.641486521956899122e-06.
+Inside modified Cholesky 509         4.641486204708436209e-06.
+Inside modified Cholesky 510         4.626992111880731085e-06.
+Inside modified Cholesky 511         4.588277799698429710e-06.
+Inside modified Cholesky 512         4.588276664877148169e-06.
+Inside modified Cholesky 513         4.582135998961902542e-06.
+Inside modified Cholesky 514         4.468883607596985473e-06.
+Inside modified Cholesky 515         4.468808929165442460e-06.
+Inside modified Cholesky 516         4.117330934753520652e-06.
+Inside modified Cholesky 517         4.083942437845829816e-06.
+Inside modified Cholesky 518         3.897256614647813655e-06.
+Inside modified Cholesky 519         3.723959899191871762e-06.
+Inside modified Cholesky 520         3.675383330560629809e-06.
+Inside modified Cholesky 521         3.469355763042727222e-06.
+Inside modified Cholesky 522         3.469143913345778232e-06.
+Inside modified Cholesky 523         3.415629644805153017e-06.
+Inside modified Cholesky 524         3.204799336998499727e-06.
+Inside modified Cholesky 525         3.177529630338125580e-06.
+Inside modified Cholesky 526         3.076210333956759268e-06.
+Inside modified Cholesky 527         2.962544907909009041e-06.
+Inside modified Cholesky 528         2.883836875368274534e-06.
+Inside modified Cholesky 529         2.883832153062461358e-06.
+Inside modified Cholesky 530         2.880399255526810376e-06.
+Inside modified Cholesky 531         2.840612718821428554e-06.
+Inside modified Cholesky 532         2.600205049109900091e-06.
+Inside modified Cholesky 533         2.564921795526141047e-06.
+Inside modified Cholesky 534         2.559016636948616101e-06.
+Inside modified Cholesky 535         2.558987915025011057e-06.
+Inside modified Cholesky 536         2.552931447471190015e-06.
+Inside modified Cholesky 537         2.474127637266933901e-06.
+Inside modified Cholesky 538         2.327404574033907805e-06.
+Inside modified Cholesky 539         2.327282028639055617e-06.
+Inside modified Cholesky 540         2.284219420472105476e-06.
+Inside modified Cholesky 541         2.236175512078959540e-06.
+Inside modified Cholesky 542         2.220723024508886655e-06.
+Inside modified Cholesky 543         2.219257451004679857e-06.
+Inside modified Cholesky 544         2.193601155390529738e-06.
+Inside modified Cholesky 545         2.136138879164640202e-06.
+Inside modified Cholesky 546         2.088421044169298048e-06.
+Inside modified Cholesky 547         1.894196851765568620e-06.
+Inside modified Cholesky 548         1.871166642512932118e-06.
+Inside modified Cholesky 549         1.853860175678231144e-06.
+Inside modified Cholesky 550         1.853850157310939317e-06.
+Inside modified Cholesky 551         1.841094517206135372e-06.
+Inside modified Cholesky 552         1.791370593522806377e-06.
+Inside modified Cholesky 553         1.731547220534680698e-06.
+Inside modified Cholesky 554         1.730872963788434879e-06.
+Inside modified Cholesky 555         1.691253010964862874e-06.
+Inside modified Cholesky 556         1.402600577980813968e-06.
+Inside modified Cholesky 557         1.402560118958257570e-06.
+Inside modified Cholesky 558         1.392327324739861900e-06.
+Inside modified Cholesky 559         1.322558932900447635e-06.
+Inside modified Cholesky 560         1.264431411673188789e-06.
+Inside modified Cholesky 561         1.261362648656136851e-06.
+Inside modified Cholesky 562         1.214957639895439378e-06.
+Inside modified Cholesky 563         1.214956312538118057e-06.
+Inside modified Cholesky 564         1.159151821953565858e-06.
+Inside modified Cholesky 565         1.118332075912455170e-06.
+Inside modified Cholesky 566         1.118319323876236371e-06.
+Inside modified Cholesky 567         1.040400908174544834e-06.
+Inside modified Cholesky 568         1.014785789332633247e-06.
+Inside modified Cholesky 569         1.014757219204932567e-06.
+Inside modified Cholesky 570         1.013040503472412240e-06.
+Inside modified Cholesky 571         1.010162362756106851e-06.
+Inside modified Cholesky 572         1.004855249869739873e-06.
+Inside modified Cholesky 573         9.914376073836596467e-07.
+Number of Cholesky fields is       573
+
+
+===========================
+nuclear repulsion this script: 23.47551397796673
+nuclear repulsion read: 23.47551397796673
+===========================
+absSum(canonic.XT.conj().T - aux):  1.2834111766051594e-13
+===========================
+absSum(h1e_read_trans - t):  3.2203740550701344e-12
+===========================
+absSum(wfn_read_trans - wfn):  1.1128044430194549e-13
+===========================
+absSum(eri_AO_read- eri_AO_icf):  3.7156436011451374e-11
+===========================
+absSum(eri_trans_read- eri_icf):  5.99659891575209e-11
+===========================
+shape of the hamiltonian arrays:
+one body operator K (h1e): (76, 76)
+two body operator after cholesky (ceri): (573, 76, 76)
+nuclear contribution of energy (enuc): 23.47551397796673
+spin up wfn coeffs (wfn_a): (76, 10)
+spin down wfn coeffs (wfn_b): (76, 8)
+ao2mo rotaton matrix ("orth_mat"): (76, 76)
+hmf0.shape = (152, 152)
+vhs1.shape = (100, 152, 152)
+ts_v_icf:  [0.18432777+0.j 0.        +0.j]
+ts_h.shape = (2,)
+ts_v.shape = (1,)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)
+wf.shape = (152, 18)

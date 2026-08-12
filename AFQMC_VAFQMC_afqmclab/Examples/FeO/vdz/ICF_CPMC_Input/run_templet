@@ -1,0 +1,21 @@
+#!/bin/bash
+#SBATCH -J AFQMC_Metro_realMaterials
+#SBATCH -p v3_64
+#SBATCH --nodes 10
+#SBATCH --ntasks-per-node 24
+#SBATCH -t 48:00:00
+
+echo "*** running SC afqmc job ***"
+echo "************************"
+
+source ~/Global/bin/module.sh 
+source ~/Global/bin/load_afqmclab.sh 
+source ~/Global/bin/load_HAFQMC.sh 
+
+##initial calculation
+python3.9 ./generateInputFile.py > _generateInputFile_log.dat
+
+srun /public1/home/sc31257/Zhi-Yu_Xiao/code/_icf_codeAFQMC_/build/afqmcPhaseless > _AFQMC_log.dat
+
+python ./dataAnalyze.py 1
+python ./getBetaVersusEnergy.py 1

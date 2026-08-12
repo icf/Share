@@ -1,0 +1,37 @@
+
+dt                                  0.01                      
+thermalSize                         8000                      
+writeNumber                         100                       
+measureNumberPerWrite               2                         
+measureSkipStep                     100                       
+
+walkerSizePerThread                 1                         
+
+forceType                           dynamicForce              
+forceCap                            10                        
+initialPhiTFlag                     readFromFile              
+initialWalkerFlag                   readFromFile              
+
+mgsStep                             10                        
+popControlStep                      10                        
+initPopControlMaxSize               0                         
+
+logEnergyCap                        4                         
+
+ET                                  -122.602                  
+backGroundInit                      EstimateFromPhiTWalker    
+ETAdjustStep                        50                        
+ETAdjustMaxSize                     500                       
+ETAndBackGroundGrowthEstimateStep   50                        
+ETAndBackGroundGrowthEstimateMaxSize 500                       
+
+seed                                111                       
+
+numOfReleasedSlice                  1                         
+numOfChains                         30                        
+numOfBrackets                       2                         
+numOfSweeps                         1                         
+numOfThermalSweeps                  1                         
+numOfMeasureSweeps                  1                         
+MetroUpdateSkip                     0                         
+numOfSweepMeasurements              80                        

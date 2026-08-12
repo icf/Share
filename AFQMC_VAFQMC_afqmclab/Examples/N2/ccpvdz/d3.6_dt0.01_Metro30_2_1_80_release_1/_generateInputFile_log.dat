@@ -1,0 +1,459 @@
+output file: mole.dat
+Molecule [geometry in Angstrom]
+[['N', (0.0, 0.0, 0.0)], ['N', (0.0, 0.0, 1.9050380964000002)]]
+Nuclear repulsion energy =   1.361111013164513395e+01 
+AO basis  cc-pVDZ
+0         0 N 1s          
+1         0 N 2s          
+2         0 N 3s          
+3         0 N 2px         
+4         0 N 2py         
+5         0 N 2pz         
+6         0 N 3px         
+7         0 N 3py         
+8         0 N 3pz         
+9         0 N 3dxy        
+10        0 N 3dyz        
+11        0 N 3dz^2       
+12        0 N 3dxz        
+13        0 N 3dx2-y2     
+14        1 N 1s          
+15        1 N 2s          
+16        1 N 3s          
+17        1 N 2px         
+18        1 N 2py         
+19        1 N 2pz         
+20        1 N 3px         
+21        1 N 3py         
+22        1 N 3pz         
+23        1 N 3dxy        
+24        1 N 3dyz        
+25        1 N 3dz^2       
+26        1 N 3dxz        
+27        1 N 3dx2-y2     
+charge                  0
+spin                    0
+orbitals               28
+alpha electrons         7
+beta  electrons         7
+
+
+Total RHF energy =  -1.083847567718840708e+02
+
+
+Eigenvalue of overlap matrix: 
+0           6.372406884557925422e-02
+1           2.010882664635074146e-01
+2           3.159028375788498488e-01
+3           3.872562091437797283e-01
+4           3.872562091437797283e-01
+5           4.639919011965148443e-01
+6           5.302098566594682927e-01
+7           5.302098566594689588e-01
+8           8.288864186544704360e-01
+9           9.485642468849841968e-01
+10          9.485642468849850850e-01
+11          9.949791737236650668e-01
+12          9.949791737236652889e-01
+13          1.005020826276333823e+00
+14          1.005020826276334711e+00
+15          1.043360420623150597e+00
+16          1.043360420623151041e+00
+17          1.057919709836413036e+00
+18          1.098730518156335823e+00
+19          1.107914503207713564e+00
+20          1.160148560326791589e+00
+21          1.370002595236044618e+00
+22          1.370002595236044618e+00
+23          1.573146212419777035e+00
+24          1.720606671452569625e+00
+25          1.720606671452570513e+00
+26          1.733150904392663172e+00
+27          2.395396098921385164e+00
+Number of dependent obritals is 0.
+
+
+Inside modified Cholesky 0           4.122252734918159689e+00.
+Inside modified Cholesky 1           4.103534697067593662e+00.
+Inside modified Cholesky 2           6.064255469787502850e-01.
+Inside modified Cholesky 3           5.786966432671135641e-01.
+Inside modified Cholesky 4           2.190580406884810316e-01.
+Inside modified Cholesky 5           2.142796263714657201e-01.
+Inside modified Cholesky 6           1.548720928247484252e-01.
+Inside modified Cholesky 7           1.548720928247484252e-01.
+Inside modified Cholesky 8           1.546341259090893150e-01.
+Inside modified Cholesky 9           1.546341259090893150e-01.
+Inside modified Cholesky 10          1.517052799030939869e-01.
+Inside modified Cholesky 11          1.505173007648491490e-01.
+Inside modified Cholesky 12          1.167263791384023919e-01.
+Inside modified Cholesky 13          1.157262440077551774e-01.
+Inside modified Cholesky 14          1.143009573841979321e-01.
+Inside modified Cholesky 15          1.109460518812262070e-01.
+Inside modified Cholesky 16          1.107141975324671124e-01.
+Inside modified Cholesky 17          1.029366361925661000e-01.
+Inside modified Cholesky 18          5.841069123169453925e-02.
+Inside modified Cholesky 19          5.840376532272003457e-02.
+Inside modified Cholesky 20          5.833584524590140763e-02.
+Inside modified Cholesky 21          5.833584524590140763e-02.
+Inside modified Cholesky 22          5.822575878335730509e-02.
+Inside modified Cholesky 23          5.822575878335730509e-02.
+Inside modified Cholesky 24          5.650537934733955436e-02.
+Inside modified Cholesky 25          5.526109443178034430e-02.
+Inside modified Cholesky 26          5.130603068920380760e-02.
+Inside modified Cholesky 27          5.123671829464955529e-02.
+Inside modified Cholesky 28          4.436230167688107184e-02.
+Inside modified Cholesky 29          4.436071745474372968e-02.
+Inside modified Cholesky 30          4.257002251993144415e-02.
+Inside modified Cholesky 31          4.256989610759612935e-02.
+Inside modified Cholesky 32          4.245593896304529491e-02.
+Inside modified Cholesky 33          4.245590002734724727e-02.
+Inside modified Cholesky 34          4.225429740893204417e-02.
+Inside modified Cholesky 35          4.225429740893204417e-02.
+Inside modified Cholesky 36          4.225420273489431666e-02.
+Inside modified Cholesky 37          4.225420273489431666e-02.
+Inside modified Cholesky 38          4.217175170403145157e-02.
+Inside modified Cholesky 39          4.217101238725152329e-02.
+Inside modified Cholesky 40          3.787018554971269962e-02.
+Inside modified Cholesky 41          3.787018554971269962e-02.
+Inside modified Cholesky 42          3.543282633046584279e-02.
+Inside modified Cholesky 43          3.543282633046584279e-02.
+Inside modified Cholesky 44          3.041491019078242791e-02.
+Inside modified Cholesky 45          2.999318915770550834e-02.
+Inside modified Cholesky 46          2.483653560485983222e-02.
+Inside modified Cholesky 47          2.454224725756801867e-02.
+Inside modified Cholesky 48          2.454224725756801867e-02.
+Inside modified Cholesky 49          2.451772677577513174e-02.
+Inside modified Cholesky 50          2.451772677577513174e-02.
+Inside modified Cholesky 51          2.389868257301824492e-02.
+Inside modified Cholesky 52          2.389868257301824492e-02.
+Inside modified Cholesky 53          2.389832663463539730e-02.
+Inside modified Cholesky 54          2.389832663463539730e-02.
+Inside modified Cholesky 55          2.345002976909483713e-02.
+Inside modified Cholesky 56          2.293961425405243240e-02.
+Inside modified Cholesky 57          2.124833232884916490e-02.
+Inside modified Cholesky 58          2.124829835021152524e-02.
+Inside modified Cholesky 59          1.856311454436710209e-02.
+Inside modified Cholesky 60          1.856311454436709862e-02.
+Inside modified Cholesky 61          1.845114477062896607e-02.
+Inside modified Cholesky 62          1.845114477062896607e-02.
+Inside modified Cholesky 63          1.836636742783000903e-02.
+Inside modified Cholesky 64          1.768808063405189618e-02.
+Inside modified Cholesky 65          1.564921091205435932e-02.
+Inside modified Cholesky 66          1.512519061548060068e-02.
+Inside modified Cholesky 67          1.417749304816442665e-02.
+Inside modified Cholesky 68          1.417411229661143593e-02.
+Inside modified Cholesky 69          1.354437995206834132e-02.
+Inside modified Cholesky 70          1.306508500364282968e-02.
+Inside modified Cholesky 71          1.306508500364282968e-02.
+Inside modified Cholesky 72          1.293863404383532346e-02.
+Inside modified Cholesky 73          1.292790321770568608e-02.
+Inside modified Cholesky 74          1.284033493894492714e-02.
+Inside modified Cholesky 75          1.279458296387299063e-02.
+Inside modified Cholesky 76          1.251048603332046913e-02.
+Inside modified Cholesky 77          1.251048603332046913e-02.
+Inside modified Cholesky 78          1.172081720980351974e-02.
+Inside modified Cholesky 79          1.166753350452073325e-02.
+Inside modified Cholesky 80          1.166753350452073325e-02.
+Inside modified Cholesky 81          9.919619436563244935e-03.
+Inside modified Cholesky 82          9.919619436563243201e-03.
+Inside modified Cholesky 83          8.915190945888702354e-03.
+Inside modified Cholesky 84          8.915190945888702354e-03.
+Inside modified Cholesky 85          8.852272097343374252e-03.
+Inside modified Cholesky 86          8.852272097343374252e-03.
+Inside modified Cholesky 87          8.846016031733211493e-03.
+Inside modified Cholesky 88          8.845655138716719545e-03.
+Inside modified Cholesky 89          8.624851384181326727e-03.
+Inside modified Cholesky 90          8.624851384181323258e-03.
+Inside modified Cholesky 91          8.624734780089897412e-03.
+Inside modified Cholesky 92          8.624734780089897412e-03.
+Inside modified Cholesky 93          7.962140854722977654e-03.
+Inside modified Cholesky 94          7.930702254179952670e-03.
+Inside modified Cholesky 95          4.391204859364570938e-03.
+Inside modified Cholesky 96          3.968374180156219143e-03.
+Inside modified Cholesky 97          3.214599618084294959e-03.
+Inside modified Cholesky 98          3.214599618084294959e-03.
+Inside modified Cholesky 99          3.213576733267220920e-03.
+Inside modified Cholesky 100         3.213576733267220920e-03.
+Inside modified Cholesky 101         3.147733362269704901e-03.
+Inside modified Cholesky 102         2.946820624208526182e-03.
+Inside modified Cholesky 103         2.946820624208526182e-03.
+Inside modified Cholesky 104         2.743135648763421735e-03.
+Inside modified Cholesky 105         2.743135648763421735e-03.
+Inside modified Cholesky 106         2.274551302479809519e-03.
+Inside modified Cholesky 107         2.253847133543122102e-03.
+Inside modified Cholesky 108         2.253847133543115163e-03.
+Inside modified Cholesky 109         2.251371962594703874e-03.
+Inside modified Cholesky 110         2.251371962594694333e-03.
+Inside modified Cholesky 111         1.859914659835159223e-03.
+Inside modified Cholesky 112         1.847785955416308143e-03.
+Inside modified Cholesky 113         1.826100128733035071e-03.
+Inside modified Cholesky 114         1.819868339902304529e-03.
+Inside modified Cholesky 115         1.815072225986467643e-03.
+Inside modified Cholesky 116         1.417522176159247398e-03.
+Inside modified Cholesky 117         1.210098915240231639e-03.
+Inside modified Cholesky 118         1.210098915240231639e-03.
+Inside modified Cholesky 119         1.179795409045284382e-03.
+Inside modified Cholesky 120         1.179795409045283515e-03.
+Inside modified Cholesky 121         8.233026321271209782e-04.
+Inside modified Cholesky 122         8.231511250664444446e-04.
+Inside modified Cholesky 123         7.824429990401538275e-04.
+Inside modified Cholesky 124         7.772646777775704544e-04.
+Inside modified Cholesky 125         3.594246354977772922e-04.
+Inside modified Cholesky 126         2.784913166512830080e-04.
+Inside modified Cholesky 127         2.449899098764518873e-04.
+Inside modified Cholesky 128         1.875412349408758349e-04.
+Inside modified Cholesky 129         1.775043286033014297e-04.
+Inside modified Cholesky 130         1.561013627285060738e-04.
+Inside modified Cholesky 131         1.561013627285055046e-04.
+Inside modified Cholesky 132         8.553027737528803756e-05.
+Inside modified Cholesky 133         8.553027737518468598e-05.
+Inside modified Cholesky 134         8.525211055146631335e-05.
+Inside modified Cholesky 135         8.525211055134499112e-05.
+Inside modified Cholesky 136         8.476167929372609741e-05.
+Inside modified Cholesky 137         8.268717421586383831e-05.
+Inside modified Cholesky 138         7.970702859376360195e-05.
+Inside modified Cholesky 139         7.970702859376358840e-05.
+Inside modified Cholesky 140         7.469506826650502713e-05.
+Inside modified Cholesky 141         7.469506826650135439e-05.
+Inside modified Cholesky 142         7.207124432802879176e-05.
+Inside modified Cholesky 143         7.207124432802356048e-05.
+Inside modified Cholesky 144         6.539455421810687731e-05.
+Inside modified Cholesky 145         6.087283877178420883e-05.
+Inside modified Cholesky 146         6.086410490228431333e-05.
+Inside modified Cholesky 147         5.288978058876439049e-05.
+Inside modified Cholesky 148         5.239888726158655098e-05.
+Inside modified Cholesky 149         5.215198710033337265e-05.
+Inside modified Cholesky 150         2.921815655364010480e-05.
+Inside modified Cholesky 151         2.563643010523157132e-05.
+Inside modified Cholesky 152         2.563643010523048034e-05.
+Inside modified Cholesky 153         2.292493815161574181e-05.
+Inside modified Cholesky 154         2.292493815161565711e-05.
+Inside modified Cholesky 155         1.833568512727015988e-05.
+Inside modified Cholesky 156         1.833568512726997354e-05.
+Inside modified Cholesky 157         1.804575478273391398e-05.
+Inside modified Cholesky 158         1.748686298925722921e-05.
+Inside modified Cholesky 159         1.748686298925630086e-05.
+Inside modified Cholesky 160         1.461111709823783896e-05.
+Inside modified Cholesky 161         1.446354097738871653e-05.
+Inside modified Cholesky 162         1.255952486175695953e-05.
+Inside modified Cholesky 163         1.241430524497046751e-05.
+Inside modified Cholesky 164         9.454168578471380813e-06.
+Inside modified Cholesky 165         8.214504166237254724e-06.
+Inside modified Cholesky 166         8.214504166236307741e-06.
+Inside modified Cholesky 167         7.220979043305162553e-06.
+Inside modified Cholesky 168         5.499168307996621640e-06.
+Inside modified Cholesky 169         5.221987232972715267e-06.
+Inside modified Cholesky 170         5.107851420406371049e-06.
+Inside modified Cholesky 171         5.107851420405452865e-06.
+Inside modified Cholesky 172         4.798079845940131511e-06.
+Inside modified Cholesky 173         4.475342557288180364e-06.
+Inside modified Cholesky 174         2.658699358885736058e-06.
+Inside modified Cholesky 175         2.658699358885705988e-06.
+Inside modified Cholesky 176         2.655973910245399078e-06.
+Inside modified Cholesky 177         2.655973910245396537e-06.
+Inside modified Cholesky 178         2.292900827631847436e-06.
+Inside modified Cholesky 179         2.292900827631834731e-06.
+Inside modified Cholesky 180         2.029188609295079237e-06.
+Inside modified Cholesky 181         2.029050064235934987e-06.
+Inside modified Cholesky 182         2.025693849787630065e-06.
+Inside modified Cholesky 183         2.025606747602852562e-06.
+Inside modified Cholesky 184         1.934139449251767090e-06.
+Inside modified Cholesky 185         1.934139449251407101e-06.
+Inside modified Cholesky 186         1.931777474012067360e-06.
+Inside modified Cholesky 187         1.931777474011540082e-06.
+Inside modified Cholesky 188         1.890869213649028402e-06.
+Inside modified Cholesky 189         1.890299853427279552e-06.
+Inside modified Cholesky 190         1.718074240314747550e-06.
+Inside modified Cholesky 191         1.713403317062900712e-06.
+Inside modified Cholesky 192         1.317093340639119224e-06.
+Inside modified Cholesky 193         1.302475171117606349e-06.
+Inside modified Cholesky 194         1.224469481682204388e-06.
+Inside modified Cholesky 195         1.150281591802251852e-06.
+Inside modified Cholesky 196         1.050793091815310495e-06.
+Inside modified Cholesky 197         1.050336676118467278e-06.
+Inside modified Cholesky 198         8.695760961551460567e-07.
+Inside modified Cholesky 199         8.695760961551276337e-07.
+Inside modified Cholesky 200         8.467451490639879004e-07.
+Inside modified Cholesky 201         8.467451490636287584e-07.
+Inside modified Cholesky 202         7.103426107040656292e-07.
+Inside modified Cholesky 203         7.103426107037188751e-07.
+Inside modified Cholesky 204         5.299956528659421222e-07.
+Inside modified Cholesky 205         5.186993696519817404e-07.
+Inside modified Cholesky 206         4.295247472245302878e-07.
+Inside modified Cholesky 207         4.295184280365096736e-07.
+Inside modified Cholesky 208         3.377317137802260963e-07.
+Inside modified Cholesky 209         3.377317137798438727e-07.
+Inside modified Cholesky 210         3.288919250021966977e-07.
+Inside modified Cholesky 211         3.288893182949483501e-07.
+Inside modified Cholesky 212         1.657651513537926861e-07.
+Inside modified Cholesky 213         1.657651513537633047e-07.
+Inside modified Cholesky 214         1.086451421219630333e-07.
+Inside modified Cholesky 215         1.086451421217194055e-07.
+Inside modified Cholesky 216         7.441229102500110553e-08.
+Inside modified Cholesky 217         7.441229102498559424e-08.
+Inside modified Cholesky 218         7.401754421341482979e-08.
+Inside modified Cholesky 219         7.401754421339587742e-08.
+Inside modified Cholesky 220         7.297602651037491743e-08.
+Inside modified Cholesky 221         6.297854742848071753e-08.
+Inside modified Cholesky 222         6.123020584846483216e-08.
+Inside modified Cholesky 223         5.229981312007092556e-08.
+Inside modified Cholesky 224         4.266913073360862962e-08.
+Inside modified Cholesky 225         4.030514336012886743e-08.
+Inside modified Cholesky 226         4.030514335987818538e-08.
+Inside modified Cholesky 227         3.998347073026359145e-08.
+Inside modified Cholesky 228         3.998347073021457604e-08.
+Inside modified Cholesky 229         3.998128827877975678e-08.
+Inside modified Cholesky 230         3.998128827873919846e-08.
+Inside modified Cholesky 231         3.099907573981259115e-08.
+Inside modified Cholesky 232         3.045092377328365906e-08.
+Inside modified Cholesky 233         3.040356950924513853e-08.
+Inside modified Cholesky 234         2.754036531538478789e-08.
+Inside modified Cholesky 235         2.753165040304105246e-08.
+Inside modified Cholesky 236         2.062223878960839233e-08.
+Inside modified Cholesky 237         2.058591142962587868e-08.
+Inside modified Cholesky 238         1.896548537846579268e-08.
+Inside modified Cholesky 239         1.861076531978763262e-08.
+Inside modified Cholesky 240         1.139314661386812163e-08.
+Inside modified Cholesky 241         1.108306981347558261e-08.
+Inside modified Cholesky 242         8.895608694621425212e-09.
+Inside modified Cholesky 243         8.842746281913156948e-09.
+Inside modified Cholesky 244         8.842746281868965651e-09.
+Inside modified Cholesky 245         8.413968382966779500e-09.
+Inside modified Cholesky 246         8.399148603746182565e-09.
+Inside modified Cholesky 247         7.872749171546715617e-09.
+Inside modified Cholesky 248         7.542891733103606317e-09.
+Inside modified Cholesky 249         6.935223473672267827e-09.
+Inside modified Cholesky 250         6.935196982608830031e-09.
+Inside modified Cholesky 251         6.772351915892256191e-09.
+Inside modified Cholesky 252         6.772351915876672108e-09.
+Inside modified Cholesky 253         6.584235576695960798e-09.
+Inside modified Cholesky 254         6.584235576472788296e-09.
+Inside modified Cholesky 255         5.037458651112096024e-09.
+Inside modified Cholesky 256         5.037458651040720263e-09.
+Inside modified Cholesky 257         4.686839003717738459e-09.
+Inside modified Cholesky 258         4.537397015799034247e-09.
+Inside modified Cholesky 259         4.165834710096870261e-09.
+Inside modified Cholesky 260         4.165834709720690853e-09.
+Inside modified Cholesky 261         2.816109705439037625e-09.
+Inside modified Cholesky 262         2.816109705282526368e-09.
+Inside modified Cholesky 263         2.521209218773425633e-09.
+Inside modified Cholesky 264         2.511243797080509948e-09.
+Inside modified Cholesky 265         2.297884997882742167e-09.
+Inside modified Cholesky 266         2.297884997856221102e-09.
+Inside modified Cholesky 267         1.422856673873644870e-09.
+Inside modified Cholesky 268         1.059236501508667087e-09.
+Inside modified Cholesky 269         1.018420632809549348e-09.
+Inside modified Cholesky 270         7.107913529531638263e-10.
+Inside modified Cholesky 271         6.844443524858116481e-10.
+Inside modified Cholesky 272         5.963751986678652066e-10.
+Inside modified Cholesky 273         5.628606693701509169e-10.
+Inside modified Cholesky 274         5.302624194363402224e-10.
+Inside modified Cholesky 275         5.302624194007882065e-10.
+Inside modified Cholesky 276         4.462045654394793918e-10.
+Inside modified Cholesky 277         4.103777105774290576e-10.
+Inside modified Cholesky 278         3.494674326385880342e-10.
+Inside modified Cholesky 279         3.494674325787440502e-10.
+Inside modified Cholesky 280         2.965477190873546230e-10.
+Inside modified Cholesky 281         2.373374681457543325e-10.
+Inside modified Cholesky 282         2.373374530942540008e-10.
+Inside modified Cholesky 283         1.829900761148445396e-10.
+Inside modified Cholesky 284         1.829900760600191378e-10.
+Inside modified Cholesky 285         1.785452441904365072e-10.
+Inside modified Cholesky 286         1.785452441898142864e-10.
+Inside modified Cholesky 287         1.644783403781381547e-10.
+Inside modified Cholesky 288         1.644783403722865757e-10.
+Inside modified Cholesky 289         1.474828093288133702e-10.
+Inside modified Cholesky 290         1.474828092975293736e-10.
+Inside modified Cholesky 291         8.621191757796923415e-11.
+Inside modified Cholesky 292         8.621191715733985350e-11.
+Inside modified Cholesky 293         8.586087445844417675e-11.
+Inside modified Cholesky 294         8.586087320069039984e-11.
+Inside modified Cholesky 295         5.241707854114241450e-11.
+Inside modified Cholesky 296         5.241707844470626072e-11.
+Inside modified Cholesky 297         3.750162513588253034e-11.
+Inside modified Cholesky 298         3.289582350795970082e-11.
+Inside modified Cholesky 299         3.280968563472012467e-11.
+Inside modified Cholesky 300         3.280968563457749418e-11.
+Inside modified Cholesky 301         2.500222936708620094e-11.
+Inside modified Cholesky 302         2.471764944936802259e-11.
+Inside modified Cholesky 303         2.407233466920225731e-11.
+Inside modified Cholesky 304         2.407233466911614652e-11.
+Inside modified Cholesky 305         1.505008495406306720e-11.
+Inside modified Cholesky 306         1.505008495134216320e-11.
+Inside modified Cholesky 307         1.397489289528194606e-11.
+Inside modified Cholesky 308         1.397489282808535062e-11.
+Inside modified Cholesky 309         1.127872977780213715e-11.
+Inside modified Cholesky 310         1.127872975674033999e-11.
+Inside modified Cholesky 311         9.130986179961230460e-12.
+Inside modified Cholesky 312         9.130986163274158918e-12.
+Inside modified Cholesky 313         6.702490172644222482e-12.
+Inside modified Cholesky 314         6.702490168223562493e-12.
+Inside modified Cholesky 315         1.883341303031389424e-12.
+Inside modified Cholesky 316         1.883341244896469948e-12.
+Inside modified Cholesky 317         1.548555318128002529e-12.
+Inside modified Cholesky 318         1.548555270472528614e-12.
+Inside modified Cholesky 319         1.429038863821147275e-12.
+Inside modified Cholesky 320         1.429038862831493728e-12.
+Inside modified Cholesky 321         1.193254412105152233e-12.
+Inside modified Cholesky 322         1.193254354478523531e-12.
+Inside modified Cholesky 323         8.422670203394040204e-13.
+Number of Cholesky fields is       323
+
+
+===========================
+nuclear repulsion this script: 13.611110131645134
+nuclear repulsion read: 13.611110131645134
+===========================
+absSum(canonic.XT.conj().T - aux):  0.0
+===========================
+absSum(h1e_read_trans - t):  2.464050499120329e-13
+===========================
+absSum(wfn_read_trans - wfn):  1.2528243217526443e-14
+===========================
+absSum(eri_AO_read- eri_AO_icf):  1.887103082754111e-12
+===========================
+absSum(eri_trans_read- eri_icf):  2.0350101675090624e-12
+===========================
+shape of the hamiltonian arrays:
+one body operator K (h1e): (28, 28)
+two body operator after cholesky (ceri): (323, 28, 28)
+nuclear contribution of energy (enuc): 13.611110131645134
+spin up wfn coeffs (wfn_a): (28, 7)
+spin down wfn coeffs (wfn_b): (28, 7)
+ao2mo rotaton matrix ("orth_mat"): (28, 28)
+hmf0.shape = (56, 56)
+vhs1.shape = (100, 56, 56)
+ts_v_icf:  [0.27225587+0.j 0.        +0.j]
+ts_h.shape = (2,)
+ts_v.shape = (1,)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
+wf.shape = (56, 14)
